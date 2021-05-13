@@ -5,13 +5,12 @@ namespace HomeTreatment.Data.Models
 {
     public class Doctor
     {
-        [Key, ForeignKey("User")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
         public string Email { get; set; }
 
-        public string UserId { get; set; }
+        //public virtual User User { get; set; }
     }
 }
