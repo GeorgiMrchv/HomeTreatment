@@ -4,14 +4,16 @@ using HomeTreatment.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeTreatment.Migrations
 {
     [DbContext(typeof(HomeTreatmentDbContext))]
-    partial class PatientDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210513163919_restore_state_2")]
+    partial class restore_state_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -309,15 +311,6 @@ namespace HomeTreatment.Migrations
                     b.HasOne("HomeTreatment.Data.Models.Patient", "Patients")
                         .WithMany("DoctorPatientMessages")
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("HomeTreatment.Data.Models.Doctor", b =>
-                {
-                    b.HasOne("HomeTreatment.Data.User", "User")
-                        .WithOne("Doctor")
-                        .HasForeignKey("HomeTreatment.Data.Models.Doctor", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HomeTreatment.Data.Models
+﻿namespace HomeTreatment.Data.Models
 {
     public class Doctor
     {
@@ -11,6 +8,6 @@ namespace HomeTreatment.Data.Models
 
         public string Email { get; set; }
 
-        //public virtual User User { get; set; }
+        public virtual User User { get; set; }
     }
 }

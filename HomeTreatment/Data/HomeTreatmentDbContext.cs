@@ -16,17 +16,17 @@ namespace HomeTreatment.Data
 
         public DbSet<Patient> Patients { get; set; }
 
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    builder.Entity<Doctor>(entity =>
-        //    {
-        //        entity.HasKey(d => d.Id);
-        //        entity.HasOne(p => p.User)
-        //             .WithOne(a => a.Doctor)
-        //             .HasForeignKey<Doctor>(d => d.Id);
-        //    });
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Doctor>(entity =>
+            {
+                entity.HasKey(d => d.Id);
+                entity.HasOne(d => d.User)
+                     .WithOne(u => u.Doctor)
+                     .HasForeignKey<Doctor>(d => d.Id);
+            });
 
-        //    base.OnModelCreating(builder);
-        //}
+            base.OnModelCreating(builder);
+        }
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeTreatment.Migrations
 {
     [DbContext(typeof(HomeTreatmentDbContext))]
-    [Migration("20210513160333_One-To-One-To-ZeroDoctors")]
-    partial class OneToOneToZeroDoctors
+    [Migration("20210513162526_restore_state")]
+    partial class restore_state
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -111,6 +111,9 @@ namespace HomeTreatment.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
@@ -161,6 +164,10 @@ namespace HomeTreatment.Migrations
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DoctorId")
+                        .IsUnique()
+                        .HasFilter("[DoctorId] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
@@ -317,6 +324,10 @@ namespace HomeTreatment.Migrations
 
             modelBuilder.Entity("HomeTreatment.Data.User", b =>
                 {
+                    b.HasOne("HomeTreatment.Data.Models.Doctor", "Doctor")
+                        .WithOne("User")
+                        .HasForeignKey("HomeTreatment.Data.User", "DoctorId");
+
                     b.HasOne("HomeTreatment.Data.Models.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId");

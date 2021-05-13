@@ -15,11 +15,6 @@ namespace HomeTreatment.Data
 
         public virtual Patient Patient { get; set; }
 
-        //[ForeignKey("Doctor")]
-        //public int? DoctorId { get; set; }
-
-        //public virtual Doctor Doctor { get; set; }
-
-        
+        public virtual Doctor Doctor { get; set; }
     }
 }
