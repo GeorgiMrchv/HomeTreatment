@@ -26,6 +26,14 @@ namespace HomeTreatment.Data
                      .HasForeignKey<Doctor>(d => d.Id);
             });
 
+            builder.Entity<Patient>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.HasOne(p => p.User)
+                     .WithOne(u => u.Patient)
+                     .HasForeignKey<Patient>(p => p.Id);
+            });
+
             base.OnModelCreating(builder);
         }
     }

@@ -4,14 +4,16 @@ using HomeTreatment.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeTreatment.Migrations
 {
     [DbContext(typeof(HomeTreatmentDbContext))]
-    partial class PatientDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210513172038_remove_patiant_user_relationship")]
+    partial class remove_patiant_user_relationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,8 +37,8 @@ namespace HomeTreatment.Migrations
                     b.Property<bool>("IsWrittenByPatient")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
+                    b.Property<string>("PatientId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
@@ -69,10 +71,8 @@ namespace HomeTreatment.Migrations
 
             modelBuilder.Entity("HomeTreatment.Data.Models.Patient", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("AttentionLevel")
                         .HasColumnType("bit");
@@ -87,9 +87,6 @@ namespace HomeTreatment.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -139,9 +136,6 @@ namespace HomeTreatment.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PatientId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -167,8 +161,6 @@ namespace HomeTreatment.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("PatientId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -308,9 +300,7 @@ namespace HomeTreatment.Migrations
                 {
                     b.HasOne("HomeTreatment.Data.Models.Patient", "Patients")
                         .WithMany("DoctorPatientMessages")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PatientId");
                 });
 
             modelBuilder.Entity("HomeTreatment.Data.Models.Doctor", b =>
@@ -320,13 +310,6 @@ namespace HomeTreatment.Migrations
                         .HasForeignKey("HomeTreatment.Data.Models.Doctor", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("HomeTreatment.Data.User", b =>
-                {
-                    b.HasOne("HomeTreatment.Data.Models.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

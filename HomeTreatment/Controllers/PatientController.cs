@@ -73,7 +73,7 @@ namespace HomeTreatment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Messages(int id)
+        public IActionResult Messages(string id)
         {
             var patientMessages = BuildPatientMessages(id);
 
@@ -83,8 +83,6 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Messages(PatientMessagesViewModel patientMessages)
         {
-
-
             var patientResponse = new DoctorPatientMessage
             {
                 Text = patientMessages.Message,
@@ -109,7 +107,6 @@ namespace HomeTreatment.Controllers
                      from c in _context.Patients
                      join p in _context.DoctorPatientMessages on c.Id equals p.PatientId into ps
                      from p in ps.DefaultIfEmpty()
-                     where p.PatientId == 2 || p.PatientId == 4
                      orderby p.Timestamp descending
                      select new MessageDetailsViewModel
                      {
@@ -138,7 +135,7 @@ namespace HomeTreatment.Controllers
             return RedirectToAction(nameof(AllMessages));
         }
 
-        public PatientMessagesViewModel BuildPatientMessages(int patientId)
+        public PatientMessagesViewModel BuildPatientMessages(string patientId)
         {
             var patient = _context.Patients.FirstOrDefault(pt => pt.Id == patientId);
 

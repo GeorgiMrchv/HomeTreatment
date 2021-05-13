@@ -18,7 +18,7 @@ namespace HomeTreatment.Data
 
         public bool IsRead { get; set; }
 
-        public int PatientId { get; set; }
+        public string PatientId { get; set; }
 
         [ForeignKey(nameof(PatientId))]
         public virtual Patient Patients { get; set; }

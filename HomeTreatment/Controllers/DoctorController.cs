@@ -24,7 +24,7 @@ namespace HomeTreatment.Controllers
 
         public IActionResult Communication(string id)
         {
-            var patientId = 122; // Here I get the Id from the login user
+            var patientId = ""; // Here I get the Id from the login user
 
             var patientMessages = _context.DoctorPatientMessages.Where(sl => sl.PatientId == patientId).ToList(); // get message           
 
@@ -67,11 +67,11 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Communication(PatientMessagesViewModel patientMessages, string id)
         {
-            var patientId = _context.Patients.FirstOrDefault(fr=>fr.UserId == id);
+            var patient = _context.Patients.FirstOrDefault(fr=>fr.Id == id);
             var patientResponse = new DoctorPatientMessage
             {
                 Text = patientMessages.Message,
-                PatientId = patientId.Id,
+                PatientId = patient.Id,
                 DoctorId = patientMessages.SelectedItem,
                 Timestamp = DateTime.Now,
                 IsRead = false,
