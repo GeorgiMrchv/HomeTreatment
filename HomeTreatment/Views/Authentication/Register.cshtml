@@ -1,0 +1,56 @@
+﻿@model RegisterViewModel
+
+@{
+    ViewData["Title"] = null;
+}
+<h1>@ViewData["Title"]</h1>
+
+
+<div class="row">
+    <div class="col-md-5 mx-auto">
+        <div id="first">
+            <div class="myform form">
+                <div class="logo mb-3">
+                    <div class="col-md-12 text-center">
+                        <h1>Register</h1>
+                    </div>
+                </div>
+                <br />
+                <form asp-action="Register" asp-controller="Authentication" method="post">
+                    <div asp-validation-summary="All"></div>
+                    <div class="form-group">
+                        <label for="emailAddress">First Name</label>
+                        <input asp-for="FirstName" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailAddress">Last Name</label>
+                        <input asp-for="LastName" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailAddress">Email address</label>
+                        <input asp-for="Email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="enterPassword">Password</label>
+                        <input asp-for="Password" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword">Confirm Password</label>
+                        <input asp-for="ConfirmPassword" class="form-control">
+                    </div>
+                    <br />
+                    <div class="col-md-14 text-center ">
+                        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Register</button>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <p class="text-center">Have already an account?  <a asp-area="" asp-controller="Authentication" asp-action="Login">Login</a></p>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

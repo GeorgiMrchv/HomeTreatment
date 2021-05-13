@@ -1,0 +1,62 @@
+﻿@model PatientMessagesViewModel
+
+@if (!Model.IsFirstVisit)
+{
+    <hr />
+    @foreach (var message in Model.Messages)
+    {
+        if (!message.IsWrittenByPatient)
+        {
+            <div class="alert alert-warning col-md-14">
+                @message.Text
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-primary col-md-14">
+                @message.Text
+            </div>
+        }
+
+    }
+    <form method="post" asp-controller="Doctor" asp-action="Communication">
+        <input type="hidden" asp-for="Patient.Id" />
+        <div class="form-group">
+            <textarea type="textarea" asp-for="@Model.Message" class="form-control" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Send Message!</button>
+    </form>
+
+}
+else
+{
+    <h3 class="text-center"> Type your message to the respective doctor</h3>
+    <hr />
+    <form method="post" asp-controller="Doctor" asp-action="Communication">
+        <input type="hidden" asp-for="Patient.Id" />
+        <label>Select a category:</label>
+
+        <br />
+
+        <select asp-for="SelectedItem" class="btn btn-outline-primary form-select" aria-label="Default select example">
+            <option value="1" selected>Diagnostics</option>
+            <option value="2">Treatment plan</option>
+            <option value="3">Prescription drugs</option>
+            <option value="4">Health equipment</option>
+        </select>
+
+        <br />
+        <br />
+
+        <label>Give us detailed description about this issue:</label>
+        <div class="form-group">
+            <textarea type="textarea" asp-for="@Model.Message" class="form-control" style="height:200px" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Send Message!</button>
+    </form>
+
+
+}
+

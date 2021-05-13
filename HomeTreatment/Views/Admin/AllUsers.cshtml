@@ -1,0 +1,67 @@
+﻿@model UserViewModel
+@{
+    ViewData["Title"] = "All Users";
+}
+<div>
+
+
+    <h3 class="text-center">List of all users</h3>
+    <br />
+
+
+
+    <table class="table" id="myTable">
+        <thead>
+            <tr>
+                <th>@nameof(UserViewModel.FirstName)</th>
+                <th>@nameof(UserViewModel.LastName)</th>
+                <th>@nameof(UserViewModel.EmailAddress)</th>
+                <th>@nameof(UserViewModel.Id)</th>
+                <th>@nameof(UserViewModel.Status)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Users)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        
+                            @switch (item.Status)
+                            {
+                                case "1":
+                                    <p class="text-primary">Doctor</p>
+                                    break;
+                                case "2":
+                                    <p class="text-warning">Patient</p>
+                                    break;
+                                default:
+                                    <p class="text-danger">Admin</p>
+                                    break;
+                            }
+                        
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="Edit" asp-controller="Admin" asp-route-id="@item.Id">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>
+
+

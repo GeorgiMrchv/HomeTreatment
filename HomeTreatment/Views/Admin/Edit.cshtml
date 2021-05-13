@@ -1,0 +1,58 @@
+﻿@model UserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+<div class="form-group col-md-3">
+    <h1>Edit</h1>
+</div>
+
+<form asp-controller="Admin" asp-action="Edit" method="post" name="login">
+    <div class="form-group col-md-3">
+        <label>First Name:</label>
+        <input asp-for="FirstName" class="form-control" />
+    </div>
+    <div class="form-group col-md-3">
+        <label>Last Name:</label>
+        <input asp-for="LastName" class="form-control" />
+    </div>
+    <div class="form-group col-md-3">
+        <label>Email Name:</label>
+        <input asp-for="EmailAddress" class="form-control" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <b>Set User Status:</b>
+        <div class="form-check">
+            @if (Model.Status == "1")
+            {<input asp-for="Status" type="radio" value="Doctor" id="flexRadioDefault1" checked /> }
+            else
+            { <input asp-for="Status" type="radio" value="Doctor" id="flexRadioDefault1" />}
+            <label class="form-check-label" for="flexRadioDefault1">
+                Doctor
+            </label>
+        </div>
+        <div class="form-check">
+            @if (Model.Status == "2")
+            {<input asp-for="Status" type="radio" value="Patient" id="flexRadioDefault2" checked /> }
+            else
+            { <input asp-for="Status" type="radio" value="Patient" id="flexRadioDefault2" />}
+            <label class="form-check-label" for="flexRadioDefault2">
+                Patient
+            </label>
+        </div>
+        <div class="form-check">
+            @if (Model.Status == "3")
+            {<input asp-for="Status" type="radio" value="Admin" id="flexRadioDefault3" checked /> }
+            else
+            { <input asp-for="Status" type="radio" value="Admin" id="flexRadioDefault3" />}
+            <label class="form-check-label" for="flexRadioDefault3">
+                Admin
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3 text-center ">
+        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Save changes!</button>
+    </div>
+</form>
+

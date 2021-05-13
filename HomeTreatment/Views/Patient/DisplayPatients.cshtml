@@ -1,0 +1,70 @@
+﻿@model PatiensListViewModel
+@{
+    ViewData["Title"] = "Patients";
+}
+<div>
+
+
+    <h1>Patients</h1>
+
+    <form method="get" asp-controller="Patient" asp-action="DisplayPatients">
+        <div class="input-group">
+            <input class="form-control" asp-for="SearchTerm" placeholder="Search by name, email address or flag" />
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table" id="myTable">
+        <thead>
+            <tr>
+                <th>@nameof(PatientViewModel.Name)</th>
+                <th>@nameof(PatientViewModel.EmailAddress)</th>
+                <th>@nameof(PatientViewModel.Notes)</th>
+                <th>@nameof(PatientViewModel.AttentionLevel)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Patients)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Messages" asp-controller="Patient" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailAddress)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+                    <td>
+                        @if (item.AttentionLevel == true)
+                        {
+                            <span class="bg-danger progress-bar">High</span>
+                        }
+                        else
+                        {
+                            <span class="bg-success progress-bar">Low</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <div page-model="@Model.PagingInfo" page-action="DisplayPatients" page-classes-enabled="true"
+         page-class="btn" page-class-normal="btn-outline-dark"
+         page-class-selected="btn-primary" class="btn-group pull-right m-1">
+
+    </div>
+
+    <div class="float-right" style="margin-top:15px; margin-right:15px">
+        <a asp-controller="Patient" asp-action="AllMessages">View All Messages</a>
+    </div>
+</div>
+
+
