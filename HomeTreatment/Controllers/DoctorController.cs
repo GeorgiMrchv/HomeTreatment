@@ -24,7 +24,7 @@ namespace HomeTreatment.Controllers
 
         public IActionResult Communication(string id)
         {
-            var patientId = ""; // Here I get the Id from the login user
+            var patientId = id; // Here I get the Id from the login user
 
             var patientMessages = _context.DoctorPatientMessages.Where(sl => sl.PatientId == patientId).ToList(); // get message           
 
