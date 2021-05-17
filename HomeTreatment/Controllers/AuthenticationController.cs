@@ -17,7 +17,7 @@ namespace HomeTreatment.Controllers
         private readonly HomeTreatmentDbContext _context;
 
 
-        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signInManager,  HomeTreatmentDbContext context)
+        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signInManager, HomeTreatmentDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -53,25 +53,28 @@ namespace HomeTreatment.Controllers
                 {
                     string userId = user.Id;
 
-                    var role = _context.UserRoles.FirstOrDefault(fr => fr.UserId == userId).RoleId;
-                    
-                    if (role == ((int)UserRole.Doctor).ToString())
+
+
+                    if (_context.Doctors.Any(an => an.Id == userId))
                     {
-                        return RedirectToAction("DisplayPatients", "Patient");
+                        return RedirectToAction("DisplayPatients", "Patient", new { id = userId });
                     }
 
-                    else if (role == ((int)UserRole.Patient).ToString())
+                    else if (_context.Patients.Any(an => an.Id == userId))
                     {
                         return RedirectToAction("Communication", "Doctor", new { id = userId });
 
                     }
 
-                    else if (role == ((int)UserRole.Admin).ToString())
+                    else if (!_context.Patients.Any(an => an.Id == userId) && !_context.Doctors.Any(an => an.Id == userId))
                     {
-                        return RedirectToAction("AllUsers", "Admin");
+                        if (_context.UserRoles.Any(fr => fr.UserId == userId && fr.RoleId == ((int)UserRole.Admin).ToString()))
+                        {
+                            return RedirectToAction("AllUsers", "Admin");
+                        }
+                        return Content("You still don't have a permission");
                     }
                 }
-
             }
             return Content("Invalid user name or password");
 

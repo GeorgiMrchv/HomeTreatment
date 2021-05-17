@@ -40,10 +40,11 @@ else
         <br />
 
         <select asp-for="SelectedItem" class="btn btn-outline-primary form-select" aria-label="Default select example">
-            <option value="1" selected>Diagnostics</option>
-            <option value="2">Treatment plan</option>
-            <option value="3">Prescription drugs</option>
-            <option value="4">Health equipment</option>
+            @foreach (var item in Model.Doctors)
+            {
+                <option value="@item.Id">@item.Name</option>
+
+            }
         </select>
 
         <br />

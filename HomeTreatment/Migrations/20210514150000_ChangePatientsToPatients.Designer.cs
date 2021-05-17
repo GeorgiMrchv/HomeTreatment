@@ -4,14 +4,16 @@ using HomeTreatment.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeTreatment.Migrations
 {
     [DbContext(typeof(HomeTreatmentDbContext))]
-    partial class HomeTreatmentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210514150000_ChangePatientsToPatients")]
+    partial class ChangePatientsToPatients
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,7 +29,7 @@ namespace HomeTreatment.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
@@ -45,8 +47,6 @@ namespace HomeTreatment.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DoctorId");
 
                     b.HasIndex("PatientId");
 
@@ -298,10 +298,6 @@ namespace HomeTreatment.Migrations
 
             modelBuilder.Entity("HomeTreatment.Data.DoctorPatientMessage", b =>
                 {
-                    b.HasOne("HomeTreatment.Data.Models.Doctor", "Doctor")
-                        .WithMany("DoctorPainetMessages")
-                        .HasForeignKey("DoctorId");
-
                     b.HasOne("HomeTreatment.Data.Models.Patient", "Patient")
                         .WithMany("DoctorPatientMessages")
                         .HasForeignKey("PatientId");

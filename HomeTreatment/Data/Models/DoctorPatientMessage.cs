@@ -8,9 +8,7 @@ namespace HomeTreatment.Data
     public class DoctorPatientMessage
     {
         [Key]
-        public int Id { get; set; }
-
-        public string DoctorId { get; set; }
+        public int Id { get; set; }              
 
         public string Text { get; set; }
 
@@ -18,12 +16,17 @@ namespace HomeTreatment.Data
 
         public bool IsRead { get; set; }
 
+        public bool IsWrittenByPatient { get; set; }
+
         public string PatientId { get; set; }
 
         [ForeignKey(nameof(PatientId))]
-        public virtual Patient Patients { get; set; }
+        public virtual Patient Patient { get; set; }
 
-        public bool IsWrittenByPatient { get; set; }
+        public string DoctorId { get; set; }
+
+        [ForeignKey(nameof(DoctorId))]
+        public virtual Doctor Doctor { get; set; }       
 
     }
 }

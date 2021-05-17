@@ -38,20 +38,23 @@
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
                     <td>
-                        
-                            @switch (item.Status)
-                            {
-                                case "1":
-                                    <p class="text-primary">Doctor</p>
-                                    break;
-                                case "2":
-                                    <p class="text-warning">Patient</p>
-                                    break;
-                                default:
-                                    <p class="text-danger">Admin</p>
-                                    break;
-                            }
-                        
+
+                        @switch (item.Status)
+                        {
+                            case "1":
+                                <p class="text-primary">Doctor</p>
+                                break;
+                            case "2":
+                                <p class="text-warning">Patient</p>
+                                break;
+                            case "3":
+                                <p class="text-success">New User</p>
+                                break;
+                            default:
+                                <p class="text-danger">Admin</p>
+                                break;
+                        }
+
                     </td>
                     <td>
                         <a class="btn btn-primary" asp-action="Edit" asp-controller="Admin" asp-route-id="@item.Id">Edit</a>

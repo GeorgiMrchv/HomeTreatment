@@ -13,5 +13,7 @@ namespace HomeTreatment.ViewModels
         public string SelectedItem { get; set; }
 
         public List<DoctorPatientMessageViewModel> Messages { get; set; }
+
+        public List<DoctorViewModel> Doctors { get; set; }
     }
 }

@@ -15,5 +15,7 @@ namespace HomeTreatment.ViewModels
 
         public bool AttentionLevel { get; set; }
 
+        public string DoctorId { get; set; }
+
     }
 }

@@ -15,5 +15,7 @@ namespace HomeTreatment.ViewModels
         public DateTime Timestamp { get; set; }
 
         public bool IsRead { get; set; }
+
+        public string DoctorId { get; set; }
     }
 }

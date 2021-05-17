@@ -11,5 +11,7 @@ namespace HomeTreatment.ViewModels {
         public PagingInfo PagingInfo { get; set; }
 
         public string SearchTerm { get; set; }
+
+        public string DoctorId { get; set; }
     }
 }

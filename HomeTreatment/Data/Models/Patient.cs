@@ -18,6 +18,6 @@ namespace HomeTreatment.Data.Models
 
         public virtual User User { get; set; }
 
-        public virtual IEnumerable<DoctorPatientMessage> DoctorPatientMessages { get; set; }
+        public virtual ICollection<DoctorPatientMessage> DoctorPatientMessages { get; set; } = new HashSet<DoctorPatientMessage>();
     }
 }

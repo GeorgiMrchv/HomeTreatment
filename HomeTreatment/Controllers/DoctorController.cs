@@ -30,9 +30,17 @@ namespace HomeTreatment.Controllers
 
             if (patientMessages.Count == 0)
             {
+                var allDoctors = _context.Doctors.Select(sl => new DoctorViewModel
+                {
+                    Id = sl.Id,
+                    Name = sl.Name,
+                    EmailAddress = sl.Email
+                }).ToList();
+
                 return View(new PatientMessagesViewModel
                 {
-                    IsFirstVisit = true
+                    IsFirstVisit = true,
+                    Doctors = allDoctors
                 });
             }
             else
@@ -55,10 +63,12 @@ namespace HomeTreatment.Controllers
 
                     allMessages.Add(messageViewModel);
                 }
+
+                
                 return View(new PatientMessagesViewModel
                 {
                     IsFirstVisit = false,
-                    Messages = allMessages
+                    Messages = allMessages                    
                 });
             }
 
@@ -67,7 +77,7 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Communication(PatientMessagesViewModel patientMessages, string id)
         {
-            var patient = _context.Patients.FirstOrDefault(fr=>fr.Id == id);
+            var patient = _context.Patients.FirstOrDefault(fr => fr.Id == id);
             var patientResponse = new DoctorPatientMessage
             {
                 Text = patientMessages.Message,
@@ -79,6 +89,12 @@ namespace HomeTreatment.Controllers
             };
 
             _context.DoctorPatientMessages.Add(patientResponse);
+            _context.SaveChanges();
+
+            patient.DoctorId = patientMessages.SelectedItem;
+            patient.Notes = patientMessages.Message;
+
+            _context.Patients.Update(patient);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Communication));

@@ -20,8 +20,9 @@ namespace HomeTreatment.Controllers
         }
 
         [Authorize]
-        public IActionResult DisplayPatients(PatiensListViewModel search, int patientPage = 1)
+        public IActionResult DisplayPatients(PatiensListViewModel search, string id)
         {
+            var doctorId = id;
 
             var patients = _context.Patients.Select(p => new PatientViewModel
             {
@@ -29,8 +30,12 @@ namespace HomeTreatment.Controllers
                 Name = p.Name,
                 AttentionLevel = p.AttentionLevel,
                 EmailAddress = p.EmailAddress,
-                Notes = p.Notes
+                Notes = p.Notes,
+                DoctorId = p.DoctorId
             });
+            // .Where(wr => wr.DoctorId == id); // new logic added here
+
+            int patientPage = 1;
 
             if (search.SearchTerm == null)
             {
@@ -40,9 +45,12 @@ namespace HomeTreatment.Controllers
                    .Take(PageSize)
                    .ToList();
 
+                var allPatientsOfCurrentDoctor = patientsByPage.Where(wr => wr.DoctorId == id).ToList();
+
                 return View(new PatiensListViewModel
                 {
-                    Patients = patientsByPage,
+                    Patients = allPatientsOfCurrentDoctor,
+                     DoctorId = doctorId,
                     PagingInfo = new PagingInfo
                     {
                         CurrentPage = patientPage,
@@ -81,13 +89,14 @@ namespace HomeTreatment.Controllers
         }
 
         [HttpPost]
-        public IActionResult Messages(PatientMessagesViewModel patientMessages)
+        public IActionResult Messages(PatientMessagesViewModel patientMessages,string id)
         {
+            var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr=>fr.PatientId == id).DoctorId;
             var patientResponse = new DoctorPatientMessage
             {
                 Text = patientMessages.Message,
                 PatientId = patientMessages.Patient.Id,
-                DoctorId = "6",
+                DoctorId = doctorId,
                 Timestamp = DateTime.Now,
                 IsRead = true
             };
@@ -99,10 +108,9 @@ namespace HomeTreatment.Controllers
 
         }
 
-        public IActionResult AllMessages()
+        public IActionResult AllMessages(string id)
         {
-
-            var qLed =
+            var currDoctorPatients =
                      (
                      from c in _context.Patients
                      join p in _context.DoctorPatientMessages on c.Id equals p.PatientId into ps
@@ -115,12 +123,15 @@ namespace HomeTreatment.Controllers
                          EmailAddress = c.EmailAddress,
                          Notes = p.Text,
                          IsRead = p.IsRead,
-                         Timestamp = p.Timestamp
-                     }).OrderByDescending(or => or.Timestamp).ToList();
+                         Timestamp = p.Timestamp,
+                         DoctorId = p.DoctorId
+
+                     }).Where(wr => wr.DoctorId == id).ToList();
+                     var currDoctorPatientsOrder = currDoctorPatients.OrderByDescending(or => or.Timestamp);
 
             return View(new PatiensListViewModel
             {
-                MessageDetails = qLed
+                MessageDetails = currDoctorPatientsOrder
             });
         }
 

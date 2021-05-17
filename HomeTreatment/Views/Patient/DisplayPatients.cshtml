@@ -62,8 +62,9 @@
 
     </div>
 
+   
     <div class="float-right" style="margin-top:15px; margin-right:15px">
-        <a asp-controller="Patient" asp-action="AllMessages">View All Messages</a>
+        <a asp-controller="Patient" asp-route-id="@Model.DoctorId" asp-action="AllMessages">View All Messages</a>
     </div>
 </div>
 
