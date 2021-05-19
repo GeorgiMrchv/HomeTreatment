@@ -13,5 +13,7 @@ namespace HomeTreatment.ViewModels {
         public string SearchTerm { get; set; }
 
         public string DoctorId { get; set; }
+
+        public Dictionary<string, List<MessageDetailsViewModel>> MessagessAll { get; set; }
     }
 }

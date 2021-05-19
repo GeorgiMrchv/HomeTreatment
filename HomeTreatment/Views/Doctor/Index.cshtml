@@ -9,17 +9,20 @@
         {
             <div class="alert alert-warning col-md-14">
                 @message.Text
+                <div class="col-md-14 float-right">@message.Timestamp</div>
             </div>
         }
         else
         {
             <div class="alert alert-primary col-md-14">
                 @message.Text
+                <div class="col-md-14 float-right">@message.Timestamp</div>
+
             </div>
         }
 
     }
-    <form method="post" asp-controller="Doctor" asp-action="Communication">
+    <form method="post" asp-controller="Dashboard" asp-action="SendMessageToDoctor">
         <input type="hidden" asp-for="Patient.Id" />
         <div class="form-group">
             <textarea type="textarea" asp-for="@Model.Message" class="form-control" placeholder="Type your message here..."></textarea>
@@ -33,9 +36,9 @@ else
 {
     <h3 class="text-center"> Type your message to the respective doctor</h3>
     <hr />
-    <form method="post" asp-controller="Doctor" asp-action="Communication">
+    <form method="post" asp-controller="Dashboard" asp-action="SendMessageToDoctor">
         <input type="hidden" asp-for="Patient.Id" />
-        <label>Select a category:</label>
+        <label>Select a doctor:</label>
 
         <br />
 

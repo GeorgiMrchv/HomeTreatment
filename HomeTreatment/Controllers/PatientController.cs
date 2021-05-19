@@ -20,13 +20,13 @@ namespace HomeTreatment.Controllers
         }
 
         [Authorize]
-        public IActionResult DisplayPatients(PatiensListViewModel search, string id)
+        public IActionResult DisplayPatients(PatiensListViewModel search)
         {
             var loggedUserEmail = User.Identity.Name;
             var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
             if (_context.Doctors.Any(an => an.Id == loggedUserId))
             {
-                var doctorId = id;
+                var doctorId = loggedUserId;
 
                 var patients = _context.Patients.Select(p => new PatientViewModel
                 {
@@ -37,7 +37,6 @@ namespace HomeTreatment.Controllers
                     Notes = p.Notes,
                     DoctorId = p.DoctorId
                 });
-                // .Where(wr => wr.DoctorId == id); // new logic added here
 
                 int patientPage = 1;
 
@@ -49,7 +48,7 @@ namespace HomeTreatment.Controllers
                        .Take(PageSize)
                        .ToList();
 
-                    var allPatientsOfCurrentDoctor = patientsByPage.Where(wr => wr.DoctorId == id).ToList();
+                    var allPatientsOfCurrentDoctor = patientsByPage.Where(wr => wr.DoctorId == loggedUserId).ToList();
 
                     return View(new PatiensListViewModel
                     {
@@ -119,52 +118,6 @@ namespace HomeTreatment.Controllers
 
             return RedirectToAction(nameof(Messages), new { id = patientMessages.Patient.Id });
 
-        }
-
-        //ADD HERE
-        [HttpGet]
-        public IActionResult AllMessages(string id)
-        {
-            var loggedUserEmail = User.Identity.Name;
-            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
-            if (_context.Doctors.Any(an => an.Id == loggedUserId))
-            {
-                var currDoctorPatients =
-                     (
-                     from c in _context.Patients
-                     join p in _context.DoctorPatientMessages on c.Id equals p.PatientId into ps
-                     from p in ps.DefaultIfEmpty()
-                     orderby p.Timestamp descending
-                     select new MessageDetailsViewModel
-                     {
-                         Id = p.Id,
-                         Name = c.Name,
-                         EmailAddress = c.EmailAddress,
-                         Notes = p.Text,
-                         IsRead = p.IsRead,
-                         Timestamp = p.Timestamp,
-                         DoctorId = p.DoctorId
-
-                     }).Where(wr => wr.DoctorId == id).ToList();
-                var currDoctorPatientsOrder = currDoctorPatients.OrderByDescending(or => or.Timestamp);
-
-                return View(new PatiensListViewModel
-                {
-                    MessageDetails = currDoctorPatientsOrder
-                });
-            }
-            return Redirect("~/Authentication/Login");
-        }
-
-        public IActionResult SetMessageAsRead(int Id)
-        {
-            var message = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.Id == Id);
-
-            message.IsRead = true;
-            _context.DoctorPatientMessages.Update(message);
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(AllMessages));
         }
 
         public PatientMessagesViewModel BuildPatientMessages(string patientId)

@@ -17,5 +17,9 @@ namespace HomeTreatment.ViewModels
         public bool IsRead { get; set; }
 
         public string DoctorId { get; set; }
+
+        public string PatientId { get; set; }
+
+        public bool IsWrittenByPatient { get; set; }       
     }
 }

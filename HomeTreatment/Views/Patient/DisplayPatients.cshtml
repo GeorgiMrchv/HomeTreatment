@@ -25,6 +25,7 @@
                 <th>@nameof(PatientViewModel.EmailAddress)</th>
                 <th>@nameof(PatientViewModel.Notes)</th>
                 <th>@nameof(PatientViewModel.AttentionLevel)</th>
+                <th>Edit</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +40,7 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Notes)
+                        @*<textarea type="text"  class="form-control">@item.Notes</textarea>*@
                     </td>
                     <td>
                         @if (item.AttentionLevel == true)
@@ -47,8 +49,11 @@
                         }
                         else
                         {
-                            <span class="bg-success progress-bar">Low</span>
+                            <span class="bg-success progress-bar">Normal</span>
                         }
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="Edit" asp-controller="Admin" asp-route-id="@item.Id">Edit</a>
                     </td>
                 </tr>
             }
@@ -60,11 +65,6 @@
          page-class="btn" page-class-normal="btn-outline-dark"
          page-class-selected="btn-primary" class="btn-group pull-right m-1">
 
-    </div>
-
-   
-    <div class="float-right" style="margin-top:15px; margin-right:15px">
-        <a asp-controller="Patient" asp-route-id="@Model.DoctorId" asp-action="AllMessages">View All Messages</a>
     </div>
 </div>
 

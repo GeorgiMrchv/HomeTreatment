@@ -1,0 +1,40 @@
+﻿@model PatiensListViewModel
+<head>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+</head>
+
+
+<div class="col-md-11"><h4> Patients messages</h4> <a asp-controller="Patient" asp-route-id="@Model.DoctorId" asp-action="DisplayPatients">View all patients</a></div>
+
+<div class="col-md-12">
+    <hr/>
+
+    @foreach (var message in Model.MessagessAll)
+    {
+        foreach (var item in message.Value.OrderByDescending(or => or.Timestamp).Take(1))
+        {
+            if (!item.IsRead)
+            {
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        @item.Name (@item.EmailAddress) @item.Timestamp
+                        <div style="float:right">
+                            <div>
+                                <label style="margin-right:10px">Unread Messages: (@message.Value.Count)</label>
+                                <a asp-controller="Patient" asp-route-id="@item.PatientId" asp-action="Messages">View message</a> |
+                                <a asp-controller="Dashboard" asp-route-id="@item.PatientId" asp-action="SetMessageAsRead">Mark all as read</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">@item.Notes</div>
+                </div>
+            }
+        }
+
+    }
+
+</div>
+

@@ -57,12 +57,14 @@ namespace HomeTreatment.Controllers
 
                     if (_context.Doctors.Any(an => an.Id == userId))
                     {
-                        return RedirectToAction("DisplayPatients", "Patient", new { id = userId });
+                        //return RedirectToAction("DisplayPatients", "Patient", new { id = userId });
+                        return RedirectToAction("Index", "Dashboard");
                     }
 
                     else if (_context.Patients.Any(an => an.Id == userId))
                     {
-                        return RedirectToAction("Communication", "Doctor", new { id = userId });
+                        //return RedirectToAction("Communication", "Doctor", new { id = userId });
+                        return RedirectToAction("Index","Dashboard");
 
                     }
 
