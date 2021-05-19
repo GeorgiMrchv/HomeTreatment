@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using HomeTreatment.Data;
 using HomeTreatment.Data.Models;
-//using HomeTreatment.Data.Models;
+using HomeTreatment.Infrastructure.Enum;
 using HomeTreatment.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,6 @@ namespace HomeTreatment.Controllers
 {
     public class AdminController : Controller
     {
-
         private readonly HomeTreatmentDbContext _context;
 
         public AdminController(HomeTreatmentDbContext context)
@@ -24,70 +23,98 @@ namespace HomeTreatment.Controllers
 
         public IActionResult AllUsers()
         {
-
-            var allUsers = _context.Users.Select(sl => new UserViewModel
+            var loggedUserEmail = User.Identity.Name;
+            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
+            if (_context.UserRoles.Any(fr => fr.UserId == loggedUserId && fr.RoleId == ((int)UserRole.Admin).ToString()))
             {
-                Id = sl.Id,
-                FirstName = sl.FirstName,
-                LastName = sl.LastName,
-                EmailAddress = sl.Email
+                var allUsers = _context.Users.Select(sl => new UserViewModel
+                {
+                    Id = sl.Id,
+                    FirstName = sl.FirstName,
+                    LastName = sl.LastName,
+                    EmailAddress = sl.Email
 
-            }).ToList();
+                }).ToList();
 
-            foreach (var item in allUsers)
-            {
-                if (_context.Doctors.Any(an => an.Id == item.Id))
+                foreach (var item in allUsers)
                 {
-                    item.Status = "1";
+                    if (_context.Doctors.Any(an => an.Id == item.Id))
+                    {
+                        item.Status = "1";
+                    }
+                    else if (_context.Patients.Any(an => an.Id == item.Id))
+                    {
+                        item.Status = "2";
+                    }
+                    else if (!_context.Doctors.Any(an => an.Id == item.Id) && !_context.Patients.Any(an => an.Id == item.Id))
+                    {
+                        if (_context.UserRoles.Any(fr => fr.UserId == item.Id && fr.RoleId == ((int)UserRole.Admin).ToString()))
+                        {
+                            item.Status = "4";
+                        }
+                        else
+                        {
+                            item.Status = "3";
+                        }
+                    }
                 }
-                else if (_context.Patients.Any(an => an.Id == item.Id))
+
+                return View(new UserViewModel
                 {
-                    item.Status = "2";
-                }
-                else if (!_context.Doctors.Any(an => an.Id == item.Id) && !_context.Patients.Any(an => an.Id == item.Id))
-                {
-                    item.Status = "3";
-                }
+                    Users = allUsers
+                });
             }
 
-            return View(new UserViewModel
-            {
-                Users = allUsers
-            });
+            return Redirect("~/Authentication/Login");
         }
 
         [HttpGet]
         public IActionResult Edit(string Id)
         {
-            var user =
-            (
-            from c in _context.Users
-            join p in _context.UserRoles on c.Id equals p.UserId into ps
-            from p in ps.DefaultIfEmpty()
-            select new UserViewModel
+            var loggedUserEmail = User.Identity.Name;
+            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
+            if (_context.UserRoles.Any(fr => fr.UserId == loggedUserId && fr.RoleId == ((int)UserRole.Admin).ToString()))
             {
-                Id = c.Id,
-                FirstName = c.FirstName,
-                LastName = c.LastName,
-                EmailAddress = c.Email,
-                Status = p.RoleId == null ? "New User" : p.RoleId
-            }).FirstOrDefault(fr => fr.Id == Id);
+                string statusId = "";
+                if (_context.Patients.Any(an => an.Id == Id))
+                {
+                    statusId = "2";
+                }
+                else if (_context.Doctors.Any(an => an.Id == Id))
+                {
+                    statusId = "1";
+                }
+                var user =
+                (
+                from c in _context.Users
+                join p in _context.UserRoles on c.Id equals p.UserId into ps
+                from p in ps.DefaultIfEmpty()
+                select new UserViewModel
+                {
+                    Id = c.Id,
+                    FirstName = c.FirstName,
+                    LastName = c.LastName,
+                    EmailAddress = c.Email,
+                    Status = statusId == "" ? "New User" : statusId
+                }).FirstOrDefault(fr => fr.Id == Id);
 
 
-            return View(new UserViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                EmailAddress = user.EmailAddress,
-                Status = user.Status 
+                return View(new UserViewModel
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    EmailAddress = user.EmailAddress,
+                    Status = user.Status
 
-            });
+                });
+
+            }
+            return Redirect("~/Authentication/Login");
         }
 
         [HttpPost]
         public IActionResult Edit(UserViewModel user)
         {
-            var buba = user;
             switch (user.Status)
             {
                 case "Patient":
@@ -97,18 +124,11 @@ namespace HomeTreatment.Controllers
                         Name = user.FirstName + " " + user.LastName,
                         EmailAddress = user.EmailAddress
                     };
-                  
+
                     _context.Patients.Add(patient);
                     _context.SaveChanges();
 
-                    return View(new UserViewModel
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        EmailAddress = user.EmailAddress,
-                        Status = user.Status
-                    });
-
+                    return RedirectToAction(nameof(AllUsers));
                 case "Doctor":
                     var doctor = new Doctor
                     {
@@ -118,14 +138,8 @@ namespace HomeTreatment.Controllers
                     };
                     _context.Doctors.Add(doctor);
                     _context.SaveChanges();
-
-                    return View(new UserViewModel
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        EmailAddress = user.EmailAddress,
-                        Status = user.Status
-                    });
+                   
+                    return RedirectToAction(nameof(AllUsers));
 
                 case "New User":
                     break;

@@ -2,9 +2,7 @@
 {
     public enum UserRole
     {
-        Doctor = 1,
-        Patient = 2,
-        Admin = 3,
-        Undefined = 4
+        Admin = 1,
+        User = 2
     }
 }
