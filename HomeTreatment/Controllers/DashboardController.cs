@@ -20,6 +20,10 @@ namespace HomeTreatment.Controllers
         public IActionResult Index()
         {
             var loggedUserEmail = User.Identity.Name;
+            if (loggedUserEmail == null)
+            {
+                return Redirect("~/Authentication/Login");
+            }
             var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
 
             if (_context.Doctors.Any(an => an.Id == loggedUserId))
@@ -111,6 +115,10 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult SendMessageToDoctor(PatientMessagesViewModel patientMessages, string id)
         {
+            if (!ModelState.IsValid)
+            {
+               // Execute validation
+            }
             var loggedUserEmail = User.Identity.Name;
             var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
 

@@ -31,6 +31,7 @@ namespace HomeTreatment.Controllers
 
         public IActionResult Login()
         {
+            var logout = LogOut();
             return View();
         }
 
@@ -124,7 +125,7 @@ namespace HomeTreatment.Controllers
         public async Task<IActionResult> LogOut()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index");
+            return Redirect("~/Authentication/Login");
         }
     }
 }

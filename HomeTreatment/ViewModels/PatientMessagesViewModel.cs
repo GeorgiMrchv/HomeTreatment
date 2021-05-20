@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeTreatment.ViewModels
 {
@@ -6,6 +7,7 @@ namespace HomeTreatment.ViewModels
     {
         public PatientViewModel Patient { get; set; }
 
+        [Required(ErrorMessage = "Please add a text message!")]
         public string Message { get; set; }
 
         public bool IsFirstVisit { get; set; }
