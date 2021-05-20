@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using HomeTreatment.Data;
+using HomeTreatment.Data.Models;
 using HomeTreatment.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeTreatment.Controllers
 {
+    [Authorize]
     public class DashboardController : Controller
     {
 
@@ -19,130 +24,75 @@ namespace HomeTreatment.Controllers
 
         public IActionResult Index()
         {
-            var loggedUserEmail = User.Identity.Name;
-            if (loggedUserEmail == null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _context.Users
+                .Include(u => u.Patient.DoctorPatientMessages)
+                .Include(u => u.Doctor.Patients)
+                .Single(u => u.Id == userId);
+
+            if (user.Doctor != null)
             {
-                return Redirect("~/Authentication/Login");
-            }
-            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
+                var patiants = FindPatientsWithUnreadMessages(user.Doctor.Id);
 
-            if (_context.Doctors.Any(an => an.Id == loggedUserId))
+                return View("/Views/Dashboard/DoctorDashboard.cshtml", patiants);
+            }
+            else if (user.Patient != null)
             {
-                var doctorId = loggedUserId;
-                var currDoctorPatients =
-                     (
-                     from c in _context.Patients
-                     join p in _context.DoctorPatientMessages on c.Id equals p.PatientId into ps
-                     from p in ps.DefaultIfEmpty()
-                     orderby p.Timestamp descending
-                     select new MessageDetailsViewModel
-                     {
-                         Id = p.Id,
-                         Name = c.Name,
-                         EmailAddress = c.EmailAddress,
-                         Notes = p.Text,
-                         IsRead = p.IsRead,
-                         Timestamp = p.Timestamp,
-                         DoctorId = p.DoctorId,
-                         IsWrittenByPatient = p.IsWrittenByPatient,
-                         PatientId = p.PatientId
+                var patientDashboardModel = BuildPatiantDashboardViewModel(user.Patient);
 
-
-                     }).Where(wr => wr.DoctorId == doctorId && wr.IsRead == false && wr.IsWrittenByPatient == true).ToList();
-
-                Dictionary<string, List<MessageDetailsViewModel>> myDictionary = currDoctorPatients.GroupBy(o => o.PatientId).ToDictionary(g => g.Key, g => g.ToList());
-
-                return View("Views/Patient/Index.cshtml", new PatiensListViewModel
-                {
-                    MessagessAll = myDictionary
-                });
+                return View("/Views/Dashboard/PatientDashboard.cshtml", patientDashboardModel);
             }
-
-            else if (_context.Patients.Any(an => an.Id == loggedUserId))
+            else
             {
-                var patientId = loggedUserId;
-
-                var patientMessages = _context.DoctorPatientMessages.Where(sl => sl.PatientId == patientId).ToList(); // get message           
-
-                if (patientMessages.Count == 0)
-                {
-                    var allDoctors = _context.Doctors.Select(sl => new DoctorViewModel
-                    {
-                        Id = sl.Id,
-                        Name = sl.Name,
-                        EmailAddress = sl.Email
-                    }).ToList();
-
-                    return View("Views/Doctor/Index.cshtml", new PatientMessagesViewModel
-                    {
-                        IsFirstVisit = true,
-                        Doctors = allDoctors
-                    });
-                }
-                else
-                {
-                    List<DoctorPatientMessageViewModel> allMessages = new List<DoctorPatientMessageViewModel>();
-
-                    foreach (var message in patientMessages)
-                    {
-                        var messageViewModel = new DoctorPatientMessageViewModel
-                        {
-                            Id = message.Id,
-                            DoctorId = message.DoctorId,
-                            PatientId = message.PatientId,
-                            Text = message.Text,
-                            IsRead = message.IsRead,
-                            Timestamp = message.Timestamp,
-                            IsWrittenByPatient = message.IsWrittenByPatient
-
-                        };
-
-                        allMessages.Add(messageViewModel);
-                    }
-
-
-                    return View("Views/Doctor/Index.cshtml", new PatientMessagesViewModel
-                    {
-                        IsFirstVisit = false,
-                        Messages = allMessages
-                    });
-                }
-
+                throw new Exception("Trying to load Dashboard, but is not Doctor or Patiant");
             }
-            return View();
         }
 
         [HttpPost]
-        public IActionResult SendMessageToDoctor(PatientMessagesViewModel patientMessages, string id)
+        [ValidateAntiForgeryToken]
+        public IActionResult SendMessageToDoctor(PatientDashboardViewModel model)
         {
             if (!ModelState.IsValid)
             {
-               // Execute validation
+                return View("/Views/Dashboard/PatientDashboard.cshtml", model);
             }
-            var loggedUserEmail = User.Identity.Name;
-            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
 
-            var patient = _context.Patients.FirstOrDefault(fr => fr.Id == loggedUserId);
-            var patientResponse = new DoctorPatientMessage
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _context.Users
+                .Include(u => u.Patient)
+                .Single(u => u.Id == userId);
+
+            if (user.Patient == null)
+                throw new Exception("Should be patient in order to message a doctor.");
+
+            if (user.Patient.DoctorId == null)
             {
-                Text = patientMessages.Message,
-                PatientId = patient.Id,
-                DoctorId = patientMessages.SelectedItem == null ? _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == loggedUserId).DoctorId : patientMessages.SelectedItem,
-                Timestamp = DateTime.Now,
-                IsRead = false,
-                IsWrittenByPatient = true
-            };
+                if (string.IsNullOrEmpty(model.DoctorId))
+                {
+                    ModelState.AddModelError(nameof(model.DoctorId), "The field is required.");
 
-            _context.DoctorPatientMessages.Add(patientResponse);
+                    return View(model);
+                }
+                else if(!_context.Doctors.Any(d => d.Id == model.DoctorId))
+                {
+                    ModelState.AddModelError(nameof(model.DoctorId), "There is no doctor with the provided Id.");
+
+                    return View(model);
+                }
+
+                user.Patient.DoctorId = model.DoctorId;
+            }
+
+            _context.DoctorPatientMessages.Add(new DoctorPatientMessage
+            {
+                DoctorId = user.Patient.DoctorId,
+                PatientId = user.Patient.Id,
+                Text = model.Message,
+                IsWrittenByPatient = true,
+                Timestamp = DateTime.Now
+            });
+
             _context.SaveChanges();
-            if (patientMessages.SelectedItem != null)
-            {
-                patient.DoctorId = patientMessages == null ? _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == loggedUserId).DoctorId : patientMessages.SelectedItem;
-                patient.Notes = patientMessages.Message;
-
-                _context.Patients.Update(patient);
-                _context.SaveChanges();
-            }
 
             return RedirectToAction(nameof(Index));
         }
@@ -158,9 +108,76 @@ namespace HomeTreatment.Controllers
             }
             _context.SaveChanges();
 
-
             return RedirectToAction(nameof(Index));
         }
 
+        [NonAction]
+        List<PatientViewModel> FindPatientsWithUnreadMessages(string doctorId)
+        {
+            return _context.Patients
+                    .Where(p => p.DoctorId == doctorId && p.DoctorPatientMessages.Any(m => m.IsWrittenByPatient && m.IsRead == false))
+                    .Select(p => new PatientViewModel
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        EmailAddress = p.EmailAddress,
+                        Messages = new List<DoctorPatientMessageViewModel>
+                        {
+                            p.DoctorPatientMessages
+                                .Where(m => m.IsWrittenByPatient && m.IsRead == false)
+                                .OrderByDescending(m => m.Timestamp)
+                                .Select(m => new DoctorPatientMessageViewModel{
+                                    Id = m.Id,
+                                    Text = m.Text,
+                                    Timestamp = m.Timestamp
+                                })
+                                .First()
+                        },
+
+                        UnreadMessagesCount = p.DoctorPatientMessages.Count(m => m.IsRead == false)
+                    })
+                    .ToList()
+                    .OrderByDescending(p => p.Messages.Single().Timestamp)
+                    .ToList();
+        }
+
+        [NonAction]
+        PatientDashboardViewModel BuildPatiantDashboardViewModel(Patient patient)
+        {
+            var model = new PatientDashboardViewModel();
+
+            var messages = patient.DoctorPatientMessages
+                .Where(m => m.DoctorId == patient.DoctorId)
+                .OrderBy(m => m.Timestamp)
+                .ToList();
+
+            if (messages.Count == 0)
+            {
+                model.Doctors = _context.Doctors
+                    .Select(d => new DoctorViewModel
+                    {
+                        Id = d.Id,
+                        EmailAddress = d.Email,
+                        Name = d.Name
+                    })
+                    .OrderBy(d => d.Name)
+                    .ToList();
+            }
+            else
+            {
+                model.Messages = messages
+                    .Select(m => new DoctorPatientMessageViewModel
+                    {
+                        Id = m.Id,
+                        Text = m.Text,
+                        Timestamp = m.Timestamp,
+                        IsRead = m.IsRead,
+                        IsWrittenByPatient = m.IsWrittenByPatient
+                    })
+                    .ToList();
+            }
+
+            return model;
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using HomeTreatment.Data;
 
 namespace HomeTreatment.ViewModels
 {
@@ -17,5 +16,8 @@ namespace HomeTreatment.ViewModels
 
         public string DoctorId { get; set; }
 
+        public List<DoctorPatientMessageViewModel> Messages { get; set; }
+
+        public int UnreadMessagesCount { get; set; }
     }
 }

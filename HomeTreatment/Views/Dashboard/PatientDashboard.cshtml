@@ -1,0 +1,52 @@
+﻿@model PatientDashboardViewModel
+
+@if (Model.Messages != null)
+{
+    <hr />
+
+    @foreach (var message in Model.Messages)
+    {
+        if (!message.IsWrittenByPatient)
+        {
+            <div class="alert alert-warning col-md-14">
+                @message.Text
+                <div class="col-md-14 float-right">@message.Timestamp</div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-primary col-md-14">
+                @message.Text
+                <div class="col-md-14 float-right">@message.Timestamp</div>
+            </div>
+        }
+
+    }
+}
+
+
+<form method="post" asp-controller="Dashboard" asp-action="SendMessageToDoctor">
+
+    @if (Model.Doctors != null)
+    {
+        <h3 class="text-center"> Type your message to the respective doctor</h3>
+        <hr />
+
+        <label>Select a doctor:</label>
+        <br />
+
+        <select asp-for="DoctorId" asp-items="Model.Doctors.Select(d => new SelectListItem { Text = d.Name, Value = d.Id })" class="btn btn-outline-primary form-select"></select>
+        <span asp-validation-for="DoctorId" class="text-danger"></span>
+        <br />
+        <br />
+    }
+
+    <label>Give us detailed description about this issue:</label>
+    <div class="form-group">
+        <textarea type="textarea" asp-for="@Model.Message" class="form-control" style="height:200px" placeholder="Type your message here..."></textarea>
+        <span asp-validation-for="Message" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Send Message!</button>
+</form>
+

@@ -7,7 +7,7 @@
 
     <h1>Patients</h1>
 
-    <form method="get" asp-controller="Patient" asp-action="DisplayPatients">
+    <form method="get" asp-controller="Doctor" asp-action="DisplayPatients">
         <div class="input-group">
             <input class="form-control" asp-for="SearchTerm" placeholder="Search by name, email address or flag" />
             <div class="input-group-append">
@@ -33,7 +33,7 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="Messages" asp-controller="Patient" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
+                        <a asp-action="Messages" asp-controller="Doctor" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.EmailAddress)

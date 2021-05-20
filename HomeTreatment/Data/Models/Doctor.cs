@@ -12,6 +12,6 @@ namespace HomeTreatment.Data.Models
 
         public virtual User User { get; set; }
 
-        public virtual ICollection<DoctorPatientMessage> DoctorPainetMessages { get; set; } = new HashSet<DoctorPatientMessage>();
+        public virtual ICollection<Patient> Patients { get; set; } = new HashSet<Patient>();
     }
 }

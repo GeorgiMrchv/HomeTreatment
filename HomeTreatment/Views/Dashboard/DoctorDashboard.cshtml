@@ -1,0 +1,27 @@
+﻿@model List<PatientViewModel>
+
+<div class="col-md-11"><h4> Patients messages</h4> <a asp-controller="Doctor" asp-action="DisplayPatients">View all patients</a></div>
+
+<div class="col-md-12">
+    <hr />
+
+    @foreach (var patient in Model)
+    {
+        <div class="card">
+            <div class="card-header bg-warning">
+                @{ var message = patient.Messages.Single(); }
+                @patient.Name (@patient.EmailAddress) @message.Timestamp
+                <div style="float:right">
+                    <div>
+                        <label style="margin-right:10px">Unread Messages: (@patient.UnreadMessagesCount)</label>
+                        <a asp-controller="Doctor" asp-route-id="@patient.Id" asp-action="Messages">View message</a> |
+                        <a asp-controller="Dashboard" asp-route-id="@patient.Id" asp-action="SetMessageAsRead">Mark all as read</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">@message.Text</div>
+        </div>
+    }
+
+</div>
+
