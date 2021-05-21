@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HomeTreatment</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -26,17 +26,29 @@
                         @if (User.Identity.Name != null)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-dark">@User.Identity.Name</span>
+                                <span class="nav-link text-dark"> @User.Identity.Name</span>
                             </li>
+                            if (ViewData["Title"].ToString() == "Home Page")
+                            {
+                            <li class="nav-item" id="dashboard">
+                                <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" style="cursor:pointer">Dashboard</a>
+                            </li>
+                            }
                             <li class="nav-item" id="services">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
                             </li>
+
                         }
                         else
                         {
-                            <li class="nav-item" id="services">
-                                <span class="nav-link text-dark" style="cursor:pointer">Services</span>
-                            </li>
+                            if (ViewData["Title"].ToString() == "Home Page")
+                            {
+                                <li class="nav-item" id="services">
+                                    <span class="nav-link text-dark" style="cursor:pointer">Services</span>
+                                </li>
+
+                            }
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
                             </li>
@@ -51,7 +63,7 @@
             @RenderBody()
         </main>
     </div>
-
+    <div style="padding-bottom:50px"></div>
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2021 - Home Treatment

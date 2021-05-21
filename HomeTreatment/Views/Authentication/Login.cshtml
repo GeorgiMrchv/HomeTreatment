@@ -1,8 +1,7 @@
 ﻿@model UserViewModel
 @{
-    ViewData["Title"] = null;
+    ViewData["Title"] = "Login";
 }
-<h1>@ViewData["Title"]</h1>
 
 <div class="container">
     <div class="row">
@@ -23,7 +22,7 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="Password">Password</label>
-                            <input asp-for="Password" class="form-control">
+                            <input type="password" asp-for="Password" class="form-control">
                         </div>
                         <br />
                         <div class="col-md-14 text-center ">
@@ -32,7 +31,7 @@
                         <br />
 
                         <div class="form-group">
-                            <p class="text-center">Don't have account?  <a asp-area="" asp-controller="Authentication" asp-action="Register">Register</a></p>
+                            <p class="text-center">Don't have an account?  <a asp-area="" asp-controller="Authentication" asp-action="Register">Register</a></p>
                         </div>
 
                     </form>

@@ -1,5 +1,9 @@
 ﻿@model PatientDashboardViewModel
 
+@{
+    ViewData["Title"] = "Doctor Communication";
+}
+
 @if (Model.Messages != null)
 {
     <hr />
@@ -39,9 +43,15 @@
         <span asp-validation-for="DoctorId" class="text-danger"></span>
         <br />
         <br />
+
+        <label>Give us detailed description about this issue:</label>
+    }
+    else
+    {
+        <p class="text-center">You are in a conversation with <b> (DOCTOR NAME HERE) </b> !</p>
+        <hr>
     }
 
-    <label>Give us detailed description about this issue:</label>
     <div class="form-group">
         <textarea type="textarea" asp-for="@Model.Message" class="form-control" style="height:200px" placeholder="Type your message here..."></textarea>
         <span asp-validation-for="Message" class="text-danger"></span>
