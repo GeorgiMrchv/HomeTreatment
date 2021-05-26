@@ -3,10 +3,12 @@ using HomeTreatment.Data;
 using HomeTreatment.Data.Models;
 using HomeTreatment.Infrastructure.Enum;
 using HomeTreatment.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeTreatment.Controllers
 {
+    [Authorize]
     public class AdminController : Controller
     {
         private readonly HomeTreatmentDbContext _context;
@@ -40,7 +42,7 @@ namespace HomeTreatment.Controllers
                 {
                     if (_context.Doctors.Any(an => an.Id == item.Id))
                     {
-                        item.Status = "1";
+                        item.Status = "1"; // to fix it with Enum
                     }
                     else if (_context.Patients.Any(an => an.Id == item.Id))
                     {
@@ -84,6 +86,7 @@ namespace HomeTreatment.Controllers
                 {
                     statusId = "1";
                 }
+
                 var user =
                 (
                 from c in _context.Users
@@ -118,31 +121,74 @@ namespace HomeTreatment.Controllers
             switch (user.Status)
             {
                 case "Patient":
+                    if (_context.Doctors.Any(an => an.Id == user.Id))
+                    {
+                        if (_context.DoctorPatientMessages.Any(an => an.DoctorId == user.Id))
+                        {
+                            var exDoctorMessages = _context.DoctorPatientMessages.First(fr => fr.DoctorId == user.Id);
+                            _context.DoctorPatientMessages.Remove(exDoctorMessages);
+                            _context.SaveChanges();
+
+                        }
+
+                        var exDoctor = _context.Doctors.FirstOrDefault(fr => fr.Id == user.Id);
+                        _context.Doctors.Remove(exDoctor);
+                        _context.SaveChanges();
+                    }
+
                     var patient = new Patient
                     {
                         Id = user.Id,
                         Name = user.FirstName + " " + user.LastName,
                         EmailAddress = user.EmailAddress
                     };
-
-                    _context.Patients.Add(patient);
-                    _context.SaveChanges();
+                    if (_context.Patients.Any(an => an.Id == patient.Id))
+                    {
+                        _context.Patients.Update(patient);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        _context.Patients.Add(patient);
+                        _context.SaveChanges();
+                    }
 
                     return RedirectToAction(nameof(AllUsers));
                 case "Doctor":
+                    if (_context.Patients.Any(an => an.Id == user.Id))
+                    {
+                        if (_context.DoctorPatientMessages.Any(an => an.PatientId == user.Id))
+                        {
+                            var exPatientMessages = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == user.Id);
+                            _context.DoctorPatientMessages.Remove(exPatientMessages);
+                            _context.SaveChanges();
+                        }
+
+                        var exPatient = _context.Patients.First(fr => fr.Id == user.Id);
+                        _context.Patients.Remove(exPatient);
+                        _context.SaveChanges();
+
+                    }
                     var doctor = new Doctor
                     {
                         Id = user.Id,
                         Name = user.FirstName + " " + user.LastName,
                         Email = user.EmailAddress
                     };
-                    _context.Doctors.Add(doctor);
-                    _context.SaveChanges();
-                   
+                    if (_context.Doctors.Any(an => an.Id == doctor.Id))
+                    {
+                        _context.Doctors.Update(doctor);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        _context.Doctors.Add(doctor);
+                        _context.SaveChanges();
+                    }
                     return RedirectToAction(nameof(AllUsers));
 
                 case "New User":
-                    break;
+                    return RedirectToAction(nameof(AllUsers));
 
                 case "Admin":
                 default:

@@ -1,0 +1,54 @@
+﻿@model PatientViewModel
+@{
+    ViewData["Title"] = "Edit Patient";
+}
+<div class="form-group text-center">
+    <a class="btn btn-outline-primary float-left" style="margin-top:15px" href="~/Doctor/DisplayPatients">Back</a>
+    <h1 style="margin-right:50px">Edit</h1>
+</div>
+<br />
+
+<div class="text-center">
+    <b>Patinet name:</b>
+    <br />
+    <span>@Model.Name</span>
+</div>
+<br />
+<br />
+
+<form asp-controller="Doctor" asp-action="Edit" method="post">
+    <div class="form-group text-center">
+        <b>Add note to patient:</b>
+        <br/>
+        <div>
+            <textarea class="form-control" style="width:200px; margin-left:42%" type="textarea" asp-for="@Model.Notes">@Model.Notes</textarea>
+        </div>
+    </div>
+
+
+    <div class="form-group text-center">
+        <b>Set User Status:</b>
+        <div class="form-check">
+            @if (Model.AttentionLevel)
+            {<input asp-for="SelectedItem" type="radio" value="High" id="highAttLvl" checked /> }
+            else
+            { <input asp-for="SelectedItem" type="radio" value="High" id="highAttLvl" />}
+            <label class="form-check-label" for="highAttLvl">
+                High
+            </label>
+        </div>
+        <div class="form-check">
+            @if (!Model.AttentionLevel)
+            {<input asp-for="SelectedItem" type="radio" value="Normal" id="normalAttLvl" checked /> }
+            else
+            { <input asp-for="SelectedItem" type="radio" value="Normal" id="normalAttLvl" />}
+            <label class="form-check-label" for="normalAttLvl">
+                Normal
+            </label>
+        </div>
+
+
+        <button type="submit" class=" btn btn-primary">Save!</button>
+    </div>
+</form>
+

@@ -2,25 +2,26 @@
 @{
     ViewData["Title"] = "Edit User";
 }
-<div class="form-group col-md-3">
-    <h1>Edit</h1>
+<div class="alert alert-warning">
+    <div class="text-center"> <strong>Note!</strong> <span>If you change the Status below from Doctor to Patient or vice versa, then all the correspondence in Messages will be deleted!</span></div>
 </div>
+<hr />
+<div class="form-group text-center">
+    <a class="btn btn-outline-primary float-left" style="margin-top:15px" href="~/Admin/AllUsers">Back</a>
+    <h1 style="margin-right:50px">Edit</h1>
+</div>
+<br />
+
+
 
 <form asp-controller="Admin" asp-action="Edit" method="post" name="login">
-    <div class="form-group col-md-3">
-        <label>First Name:</label>
-        <input asp-for="FirstName" class="form-control" />
-    </div>
-    <div class="form-group col-md-3">
-        <label>Last Name:</label>
-        <input asp-for="LastName" class="form-control" />
-    </div>
-    <div class="form-group col-md-3">
-        <label>Email Name:</label>
-        <input asp-for="EmailAddress" class="form-control" />
+    <div class="form-group  text-center">
+        <b>User Name:</b>
+        <br/>
+        <label>@Model.FirstName @Model.LastName </label>
     </div>
 
-    <div class="form-group col-md-3">
+    <div class="form-group text-center">
         <b>Set User Status:</b>
         <div class="form-check">
             @if (Model.Status == "1")
@@ -51,8 +52,8 @@
         </div>
     </div>
 
-    <div class="col-md-3 text-center ">
-        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm">Save changes!</button>
+    <div class="text-center ">
+        <button type="submit" class=" btn btn-primary" style="width:200px">Save changes!</button>
     </div>
 </form>
 

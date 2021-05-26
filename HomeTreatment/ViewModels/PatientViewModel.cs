@@ -19,5 +19,7 @@ namespace HomeTreatment.ViewModels
         public List<DoctorPatientMessageViewModel> Messages { get; set; }
 
         public int UnreadMessagesCount { get; set; }
+
+        public string SelectedItem { get; set; }
     }
 }

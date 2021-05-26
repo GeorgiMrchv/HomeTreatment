@@ -7,7 +7,8 @@ namespace HomeTreatment.ViewModels
     {
         public PatientViewModel Patient { get; set; }
 
-        [Required(ErrorMessage = "Please add a text message!")]
+        [Required(ErrorMessage = "Please add a text message!")] 
+        //TODO: To add length attribute here
         public string Message { get; set; }
 
         public bool IsFirstVisit { get; set; }

@@ -27,6 +27,7 @@ namespace HomeTreatment.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _context.Users
                 .Include(u => u.Patient.DoctorPatientMessages)
+                .Include(u => u.Patient.Doctor)
                 .Include(u => u.Doctor.Patients)
                 .Single(u => u.Id == userId);
 
@@ -49,18 +50,18 @@ namespace HomeTreatment.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] 
         public IActionResult SendMessageToDoctor(PatientDashboardViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("/Views/Dashboard/PatientDashboard.cshtml", model);
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _context.Users
-                .Include(u => u.Patient)
+                .Include(u => u.Patient.DoctorPatientMessages)
                 .Single(u => u.Id == userId);
+
+            if (!ModelState.IsValid)
+            {
+                return View("/Views/Dashboard/PatientDashboard.cshtml", BuildPatiantDashboardViewModel(user.Patient));
+            }
 
             if (user.Patient == null)
                 throw new Exception("Should be patient in order to message a doctor.");
@@ -73,7 +74,7 @@ namespace HomeTreatment.Controllers
 
                     return View(model);
                 }
-                else if(!_context.Doctors.Any(d => d.Id == model.DoctorId))
+                else if (!_context.Doctors.Any(d => d.Id == model.DoctorId))
                 {
                     ModelState.AddModelError(nameof(model.DoctorId), "There is no doctor with the provided Id.");
 
@@ -104,7 +105,7 @@ namespace HomeTreatment.Controllers
             foreach (var item in message)
             {
                 item.IsRead = true;
-                _context.DoctorPatientMessages.Update(item);                
+                _context.DoctorPatientMessages.Update(item);
             }
             _context.SaveChanges();
 
@@ -175,6 +176,17 @@ namespace HomeTreatment.Controllers
                         IsWrittenByPatient = m.IsWrittenByPatient
                     })
                     .ToList();
+
+                model.Doctors = new List<DoctorViewModel>()
+                {
+                     new DoctorViewModel
+                     {
+                        Id = patient.Id,
+                        Name = patient.Doctor.Name,
+                        EmailAddress = patient.EmailAddress
+                     }
+                };
+
             }
 
             return model;

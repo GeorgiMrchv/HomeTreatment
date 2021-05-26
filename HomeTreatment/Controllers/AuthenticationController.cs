@@ -118,6 +118,8 @@ namespace HomeTreatment.Controllers
                     return View("Thanks");
                 }
             }
+            //TODO: PAssword is weak notification
+            //return View("Error ",model)
             return Content("You failed register");
         }
 

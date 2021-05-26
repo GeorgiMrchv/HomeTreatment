@@ -4,9 +4,11 @@
 }
 <div>
 
-
-    <h1>Patients</h1>
-
+    <div class="text-center">
+        <a class="btn btn-outline-primary float-left" style="margin-top:15px" href="~/Dashboard">Back</a>
+        <h1>Patients</h1>
+    </div>
+    <br />
     <form method="get" asp-controller="Doctor" asp-action="DisplayPatients">
         <div class="input-group">
             <input class="form-control" asp-for="SearchTerm" placeholder="Search by name, email address or flag" />
@@ -18,53 +20,60 @@
         </div>
     </form>
 
-    <table class="table" id="myTable">
-        <thead>
-            <tr>
-                <th>@nameof(PatientViewModel.Name)</th>
-                <th>@nameof(PatientViewModel.EmailAddress)</th>
-                <th>@nameof(PatientViewModel.Notes)</th>
-                <th>@nameof(PatientViewModel.AttentionLevel)</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Patients)
-            {
+    <br />
+
+    @*<table class="table" id="myTable" >
+        <thead>*@
+    <div style="height: 600px; overflow: auto; ">
+        <table class="table mb-0">
+            <thead>
                 <tr>
-                    <td>
-                        <a asp-action="Messages" asp-controller="Doctor" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EmailAddress)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Notes)
-                        @*<textarea type="text"  class="form-control">@item.Notes</textarea>*@
-                    </td>
-                    <td>
-                        @if (item.AttentionLevel == true)
-                        {
-                            <span class="bg-danger progress-bar">High</span>
-                        }
-                        else
-                        {
-                            <span class="bg-success progress-bar">Normal</span>
-                        }
-                    </td>
-                    <td>
-                        <a class="btn btn-primary" asp-action="Edit" asp-controller="Admin" asp-route-id="@item.Id">Edit</a>
-                    </td>
+                    <th>@nameof(PatientViewModel.Name)</th>
+                    <th>@nameof(PatientViewModel.EmailAddress)</th>
+                    <th>@nameof(PatientViewModel.Notes)</th>
+                    <th>@nameof(PatientViewModel.AttentionLevel)</th>
+                    <th>Edit</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model.Patients)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Messages" asp-controller="Doctor" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EmailAddress)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Notes)
+                            @*<textarea type="text"  class="form-control">@item.Notes</textarea>*@
+                        </td>
+                        <td>
+                            @if (item.AttentionLevel == true)
+                            {
+                                <span class="bg-danger progress-bar">High</span>
+                            }
+                            else
+                            {
+                                <span class="bg-success progress-bar">Normal</span>
+                            }
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" asp-action="Edit" asp-controller="Doctor" asp-route-id="@item.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
 
-    <div page-model="@Model.PagingInfo" page-action="DisplayPatients" page-classes-enabled="true"
-         page-class="btn" page-class-normal="btn-outline-dark"
-         page-class-selected="btn-primary" class="btn-group pull-right m-1">
+        @*<div page-model="@Model.PagingInfo" page-action="DisplayPatients" page-classes-enabled="true"
+                 page-class="btn" page-class-normal="btn-outline-dark"
+                 page-class-selected="btn-primary" class="btn-group pull-right m-1">
 
+            </div>*@
     </div>
 </div>
 

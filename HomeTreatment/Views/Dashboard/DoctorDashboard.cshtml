@@ -4,7 +4,7 @@
     ViewData["Title"] = "Unread Messages";
 }
 
-<div class="col-md-11"><h4> Patients messages</h4> <a asp-controller="Doctor" asp-action="DisplayPatients">View all patients</a></div>
+<div class="col-md-11 text-center"><h4> Patients messages</h4> <a asp-controller="Doctor" asp-action="DisplayPatients">View all patients</a></div>
 
 <div class="col-md-12">
     <hr />
@@ -23,8 +23,9 @@
                     </div>
                 </div>
             </div>
-            <div class="card-body">@message.Text</div>
+            <div class="card-body" style="background-color:blanchedalmond">@message.Text</div>
         </div>
+        <br />
     }
 
 </div>

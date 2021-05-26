@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HomeTreatment.Controllers
 {
+    [Authorize]
     public class DoctorController : Controller
     {
 
@@ -19,7 +20,7 @@ namespace HomeTreatment.Controllers
             _context = context;
         }
 
-        [Authorize]
+
         public IActionResult DisplayPatients(PatiensListViewModel search)
         {
             var loggedUserEmail = User.Identity.Name;
@@ -38,27 +39,27 @@ namespace HomeTreatment.Controllers
                     DoctorId = p.DoctorId
                 });
 
-                int patientPage = 1;
+                //int patientPage = 1;
 
                 if (search.SearchTerm == null)
                 {
-                    var patientsByPage = patients
-                       .OrderBy(p => p.Id)
-                       .Skip((patientPage - 1) * PageSize)
-                       .Take(PageSize)
-                       .ToList();
+                    //var patientsByPage = patients
+                    //   .OrderBy(p => p.Id)
+                    //   .Skip((patientPage - 1) * PageSize)
+                    //   .Take(PageSize)
+                    //   .ToList();
 
-                    var allPatientsOfCurrentDoctor = patientsByPage.Where(wr => wr.DoctorId == loggedUserId).ToList();
+                    var allPatientsOfCurrentDoctor = patients.Where(wr => wr.DoctorId == loggedUserId).ToList();
 
                     return View(new PatiensListViewModel
                     {
                         Patients = allPatientsOfCurrentDoctor,
-                        PagingInfo = new PagingInfo
-                        {
-                            CurrentPage = patientPage,
-                            ItemsPerPage = PageSize,
-                            TotalItems = _context.Patients.Count()
-                        }
+                        //PagingInfo = new PagingInfo
+                        //{
+                        //    CurrentPage = patientPage,
+                        //    ItemsPerPage = PageSize,
+                        //    TotalItems = _context.Patients.Count()
+                        //}
                     });
                 }
 
@@ -72,12 +73,12 @@ namespace HomeTreatment.Controllers
                 return View(new PatiensListViewModel
                 {
                     Patients = filterPatients,
-                    PagingInfo = new PagingInfo
-                    {
-                        CurrentPage = 1,
-                        ItemsPerPage = PageSize,
-                        TotalItems = _context.Patients.Count()
-                    }
+                    //PagingInfo = new PagingInfo
+                    //{
+                    //    CurrentPage = 1,
+                    //    ItemsPerPage = PageSize,
+                    //    TotalItems = _context.Patients.Count()
+                    //}
                 });
 
             }
@@ -103,6 +104,25 @@ namespace HomeTreatment.Controllers
         public IActionResult Messages(PatientMessagesViewModel patientMessages, string id)
         {
             var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == id).DoctorId;
+
+            if (!ModelState.IsValid)
+            {
+                var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == id);
+
+                patientMessages.Messages = messages
+                    .Select(m => new DoctorPatientMessageViewModel
+                    {
+                        Id = m.Id,
+                        Text = m.Text,
+                        Timestamp = m.Timestamp,
+                        IsRead = m.IsRead,
+                        IsWrittenByPatient = m.IsWrittenByPatient
+                    })
+                    .ToList();
+                patientMessages.Patient.Name = _context.Patients.Single(sl => sl.Id == id).Name;
+                return View("/Views/Doctor/Messages.cshtml", patientMessages);
+            }
+
             var patientResponse = new DoctorPatientMessage
             {
                 Text = patientMessages.Message,
@@ -117,6 +137,34 @@ namespace HomeTreatment.Controllers
 
             return RedirectToAction(nameof(Messages), new { id = patientMessages.Patient.Id });
 
+        }
+
+        [HttpGet]
+        public IActionResult Edit(string Id)
+        {
+            var user = _context.Patients.FirstOrDefault(fr => fr.Id == Id);
+
+            var model = new PatientViewModel
+            {
+                Name = user.Name,
+                AttentionLevel = user.AttentionLevel,
+                Notes = user.Notes
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(PatientViewModel model)
+        {
+            var edit = _context.Patients.FirstOrDefault(fr=>fr.Id == model.Id);
+
+            edit.Notes = model.Notes;            
+            edit.AttentionLevel = model.SelectedItem == "High" ? model.AttentionLevel = true : model.AttentionLevel = false;
+
+            _context.Patients.Update(edit);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(DisplayPatients));
         }
 
         public PatientMessagesViewModel BuildPatientMessages(string patientId)
