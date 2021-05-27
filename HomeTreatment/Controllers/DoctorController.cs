@@ -105,9 +105,10 @@ namespace HomeTreatment.Controllers
         {
             var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == id).DoctorId;
 
+            var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == id).ToList();
+
             if (!ModelState.IsValid)
-            {
-                var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == id);
+            {               
 
                 patientMessages.Messages = messages
                     .Select(m => new DoctorPatientMessageViewModel
@@ -134,6 +135,17 @@ namespace HomeTreatment.Controllers
 
             _context.DoctorPatientMessages.Add(patientResponse);
             _context.SaveChanges();
+
+
+            var seenMessages = messages.Where(sl => sl.IsRead == false).ToList();
+
+            foreach (var item in seenMessages)
+            {
+                item.IsRead = true;
+                _context.DoctorPatientMessages.Update(item);
+            }
+            _context.SaveChanges();
+
 
             return RedirectToAction(nameof(Messages), new { id = patientMessages.Patient.Id });
 
