@@ -18,7 +18,11 @@
     <div class="form-group  text-center">
         <b>User Name:</b>
         <br/>
-        <label>@Model.FirstName @Model.LastName </label>
+        <div class="form-group">
+            <input asp-for="FirstName" value="@Model.FirstName" />
+            <input asp-for="LastName" value="@Model.LastName" />
+            <input asp-for="EmailAddress" type="hidden" />
+        </div>
     </div>
 
     <div class="form-group text-center">

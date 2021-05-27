@@ -23,19 +23,31 @@
 
                 @if (User.Identity.Name != null && ViewData["Title"].ToString() == "Home Page")
                 {
-                    <ul class="navbar-nav ms-auto float-left">
-                        <li class="nav-item" id="dashboard">
-                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" style="cursor:pointer">| Dashboard</a>
-                        </li>
-                    </ul>
+                    @if (User.Identity.Name == "administrator@gmail.com")
+                    {
+                        <ul class="navbar-nav ms-auto float-left">
+                            <li class="nav-item" id="dashboard">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="AllUsers" style="cursor:pointer">| Admin</a>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto float-left">
+                            <li class="nav-item" id="dashboard">
+                                <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index" style="cursor:pointer">| Dashboard</a>
+                            </li>
+                        </ul>
+                    }
                 }
+
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav ms-auto ">
 
                         @if (User.Identity.Name != null)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-dark"> @User.Identity.Name</span> 
+                                <span class="nav-link text-dark"> @User.Identity.Name</span>
                             </li>
 
                             <li class="nav-item" id="services">
@@ -53,11 +65,11 @@
 
                             }
 
-                            if (ViewData["Title"].ToString() != "Login")
+                            if (ViewData["Title"].ToString() != "Login" && ViewData["Title"].ToString() != "Register")
                             {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
+                                </li>
                             }
                         }
                     </ul>

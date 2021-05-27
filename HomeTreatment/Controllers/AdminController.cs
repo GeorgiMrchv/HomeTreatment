@@ -154,6 +154,7 @@ namespace HomeTreatment.Controllers
                     }
 
                     return RedirectToAction(nameof(AllUsers));
+
                 case "Doctor":
                     if (_context.Patients.Any(an => an.Id == user.Id))
                     {
