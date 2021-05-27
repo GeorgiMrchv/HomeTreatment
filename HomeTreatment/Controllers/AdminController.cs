@@ -42,7 +42,7 @@ namespace HomeTreatment.Controllers
                 {
                     if (_context.Doctors.Any(an => an.Id == item.Id))
                     {
-                        item.Status = "1"; // to fix it with Enum
+                        item.Status = "1"; 
                     }
                     else if (_context.Patients.Any(an => an.Id == item.Id))
                     {

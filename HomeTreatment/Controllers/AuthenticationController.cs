@@ -58,13 +58,11 @@ namespace HomeTreatment.Controllers
 
                     if (_context.Doctors.Any(an => an.Id == userId))
                     {
-                        //return RedirectToAction("DisplayPatients", "Patient", new { id = userId });
                         return RedirectToAction("Index", "Dashboard");
                     }
 
                     else if (_context.Patients.Any(an => an.Id == userId))
                     {
-                        //return RedirectToAction("Communication", "Doctor", new { id = userId });
                         return RedirectToAction("Index","Dashboard");
 
                     }
@@ -97,7 +95,7 @@ namespace HomeTreatment.Controllers
             {
                 return View(registerViewModel);
             }
-            var user = new User // tuka probvah User
+            var user = new User 
             {
                 FirstName = registerViewModel.FirstName,
                 LastName = registerViewModel.LastName,
@@ -109,17 +107,14 @@ namespace HomeTreatment.Controllers
 
             if (result.Succeeded)
             {
-                //sign in
                 var signInResult = await _signInManager.PasswordSignInAsync(user, registerViewModel.Password, true, false);
 
                 if (signInResult.Succeeded)
                 {
-                    //return RedirectToAction("DisplayPatients", "Patient");
                     return View("Thanks");
                 }
             }
-            //TODO: PAssword is weak notification
-            //return View("Error ",model)
+            
             return Content("You failed register");
         }
 

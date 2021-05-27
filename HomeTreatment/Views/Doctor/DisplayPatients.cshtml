@@ -22,8 +22,6 @@
 
     <br />
 
-    @*<table class="table" id="myTable" >
-        <thead>*@
     <div style="height: 600px; overflow: auto; ">
         <table class="table mb-0">
             <thead>
@@ -48,7 +46,6 @@
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Notes)
-                            @*<textarea type="text"  class="form-control">@item.Notes</textarea>*@
                         </td>
                         <td>
                             @if (item.AttentionLevel == true)
@@ -66,14 +63,7 @@
                     </tr>
                 }
             </tbody>
-        </table>
-
-
-        <div page-model="@Model.PagingInfo" page-action="DisplayPatients" page-classes-enabled="true"
-                 page-class="btn" page-class-normal="btn-outline-dark"
-                 page-class-selected="btn-primary" class="btn-group pull-right m-1">
-
-            </div>
+        </table>     
     </div>
 </div>
 

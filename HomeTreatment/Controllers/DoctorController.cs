@@ -14,7 +14,6 @@ namespace HomeTreatment.Controllers
 
         private readonly HomeTreatmentDbContext _context;
 
-        public int PageSize = 4;
         public DoctorController(HomeTreatmentDbContext context)
         {
             _context = context;
@@ -39,27 +38,18 @@ namespace HomeTreatment.Controllers
                     DoctorId = p.DoctorId
                 });
 
-                //int patientPage = 1;
+
 
                 if (search.SearchTerm == null)
                 {
-                    //var patientsByPage = patients
-                    //   .OrderBy(p => p.Id)
-                    //   .Skip((patientPage - 1) * PageSize)
-                    //   .Take(PageSize)
-                    //   .ToList();
+
 
                     var allPatientsOfCurrentDoctor = patients.Where(wr => wr.DoctorId == loggedUserId).ToList();
 
                     return View(new PatiensListViewModel
                     {
                         Patients = allPatientsOfCurrentDoctor,
-                        //PagingInfo = new PagingInfo
-                        //{
-                        //    CurrentPage = patientPage,
-                        //    ItemsPerPage = PageSize,
-                        //    TotalItems = _context.Patients.Count()
-                        //}
+
                     });
                 }
 
@@ -73,12 +63,7 @@ namespace HomeTreatment.Controllers
                 return View(new PatiensListViewModel
                 {
                     Patients = filterPatients,
-                    //PagingInfo = new PagingInfo
-                    //{
-                    //    CurrentPage = 1,
-                    //    ItemsPerPage = PageSize,
-                    //    TotalItems = _context.Patients.Count()
-                    //}
+
                 });
 
             }
@@ -108,7 +93,7 @@ namespace HomeTreatment.Controllers
             var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == id).ToList();
 
             if (!ModelState.IsValid)
-            {               
+            {
 
                 patientMessages.Messages = messages
                     .Select(m => new DoctorPatientMessageViewModel
@@ -168,9 +153,9 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Edit(PatientViewModel model)
         {
-            var edit = _context.Patients.FirstOrDefault(fr=>fr.Id == model.Id);
+            var edit = _context.Patients.FirstOrDefault(fr => fr.Id == model.Id);
 
-            edit.Notes = model.Notes;            
+            edit.Notes = model.Notes;
             edit.AttentionLevel = model.SelectedItem == "High" ? model.AttentionLevel = true : model.AttentionLevel = false;
 
             _context.Patients.Update(edit);

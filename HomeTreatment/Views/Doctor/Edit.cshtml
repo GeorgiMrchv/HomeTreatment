@@ -8,25 +8,25 @@
 </div>
 <br />
 
-<div class="text-center">
+
     <b>Patinet name:</b>
     <br />
     <span>@Model.Name</span>
-</div>
+
 <br />
 <br />
 
 <form asp-controller="Doctor" asp-action="Edit" method="post">
-    <div class="form-group text-center">
+    <div class="form-group">
         <b>Add note to patient:</b>
         <br/>
         <div>
-            <textarea class="form-control" style="width:200px; margin-left:42%" type="textarea" asp-for="@Model.Notes">@Model.Notes</textarea>
+            <textarea class="form-control" style="width:200px;"  type="textarea" asp-for="@Model.Notes">@Model.Notes</textarea>
         </div>
     </div>
 
 
-    <div class="form-group text-center">
+    <div class="form-group">
         <b>Set User Status:</b>
         <div class="form-check">
             @if (Model.AttentionLevel)

@@ -3,8 +3,8 @@
     ViewData["Title"] = "Edit User";
 }
 <div class="alert alert-warning">
-    <div class="text-center"> <strong>Note!</strong> <span>If you change the Status below from Doctor to Patient or vice versa, then all the correspondence in Messages will be deleted!</span></div>
-</div>
+     <strong>Note!</strong> <span>If you change the Status below from Doctor to Patient or vice versa, then all the correspondence in Messages will be deleted!</span></div>
+
 <hr />
 <div class="form-group text-center">
     <a class="btn btn-outline-primary float-left" style="margin-top:15px" href="~/Admin/AllUsers">Back</a>
@@ -15,17 +15,19 @@
 
 
 <form asp-controller="Admin" asp-action="Edit" method="post" name="login">
-    <div class="form-group  text-center">
+    <div class="form-group">
         <b>User Name:</b>
         <br/>
         <div class="form-group">
-            <input asp-for="FirstName" value="@Model.FirstName" />
-            <input asp-for="LastName" value="@Model.LastName" />
+            <label>@Model.FirstName</label>
+            <label>@Model.LastName</label>
+            <input asp-for="FirstName" type="hidden" />
+            <input asp-for="LastName" type="hidden" />
             <input asp-for="EmailAddress" type="hidden" />
         </div>
     </div>
 
-    <div class="form-group text-center">
+    <div class="form-group">
         <b>Set User Status:</b>
         <div class="form-check">
             @if (Model.Status == "1")
@@ -56,8 +58,8 @@
         </div>
     </div>
 
-    <div class="text-center ">
+    
         <button type="submit" class=" btn btn-primary" style="width:200px">Save changes!</button>
-    </div>
+    
 </form>
 
