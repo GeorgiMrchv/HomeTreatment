@@ -73,6 +73,7 @@ namespace HomeTreatment.Controllers
                         {
                             return RedirectToAction("AllUsers", "Admin");
                         }
+                        var logout = LogOut();
                         return Content("You still don't have a permission");
                     }
                 }
@@ -111,6 +112,7 @@ namespace HomeTreatment.Controllers
 
                 if (signInResult.Succeeded)
                 {
+                    var logout = LogOut();
                     return View("Thanks");
                 }
             }

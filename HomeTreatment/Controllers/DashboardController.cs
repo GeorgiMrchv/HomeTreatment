@@ -50,7 +50,7 @@ namespace HomeTreatment.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public IActionResult SendMessageToDoctor(PatientDashboardViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -152,19 +152,17 @@ namespace HomeTreatment.Controllers
                 .OrderBy(m => m.Timestamp)
                 .ToList();
 
-            if (messages.Count == 0)
-            {
-                model.Doctors = _context.Doctors
-                    .Select(d => new DoctorViewModel
-                    {
-                        Id = d.Id,
-                        EmailAddress = d.Email,
-                        Name = d.Name
-                    })
-                    .OrderBy(d => d.Name)
-                    .ToList();
-            }
-            else
+            model.Doctors = _context.Doctors
+                .Select(d => new DoctorViewModel
+                {
+                    Id = d.Id,
+                    EmailAddress = d.Email,
+                    Name = d.Name
+                })
+                 .OrderBy(d => d.Name)
+                 .ToList();
+
+            if (messages.Count != 0)
             {
                 model.Messages = messages
                     .Select(m => new DoctorPatientMessageViewModel
@@ -176,18 +174,8 @@ namespace HomeTreatment.Controllers
                         IsWrittenByPatient = m.IsWrittenByPatient
                     })
                     .ToList();
-
-                model.Doctors = new List<DoctorViewModel>()
-                {
-                     new DoctorViewModel
-                     {
-                        Id = patient.Id,
-                        Name = patient.Doctor.Name,
-                        EmailAddress = patient.EmailAddress
-                     }
-                };
-
             }
+
 
             return model;
         }
