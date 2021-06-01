@@ -13,6 +13,8 @@ namespace HomeTreatment.ViewModels
 
         public string DoctorId { get; set; }
 
+        public string DoctorName { get; set; }
+
         public List<DoctorViewModel> Doctors { get; set; }
     }
 }

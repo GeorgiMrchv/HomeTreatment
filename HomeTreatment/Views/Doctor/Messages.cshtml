@@ -1,6 +1,6 @@
 ﻿@model PatientMessagesViewModel
 @{
-    ViewData["Title"] = "Patient Message";
+    ViewData["Title"] = "Patient Message";    
 }
 <div class="text-center">
     <a class="btn btn-outline-primary float-left" style="margin-top:-5px" href="~/Dashboard">Back</a>
@@ -9,8 +9,17 @@
 <hr>
 
 <div>
+    @if (Model.Messages.Count >= 7)
+    {
+        <form method="post" asp-controller="Doctor" asp-action="LoadMoreMessages">
+            <div class="text-center">
+                <input type="hidden" asp-for="Patient.Id" />
+                <button  type="submit" class=" btn btn-outline-primary btn-sm" style="margin-bottom:10px">View history</button>
+            </div>
+        </form>
+    }
     <div class="panel-body" runat="server" style="overflow-y: auto; display: flex; flex-direction: column-reverse; height: 500px">
-        @foreach (var message in Model.Messages.OrderByDescending(or=>or.Timestamp))
+        @foreach (var message in Model.Messages)
         {
             if (message.IsWrittenByPatient)
             {
@@ -32,7 +41,7 @@
 </div>
 
 
-<form  method="post" asp-controller="Doctor" asp-action="Messages">
+<form method="post" asp-controller="Doctor" asp-action="Messages">
 
     <input type="hidden" asp-for="Patient.Id" />
     <div class="form-group">

@@ -5,6 +5,8 @@ using HomeTreatment.ViewModels;
 using HomeTreatment.Data;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using HomeTreatment.BusinessLayer;
 
 namespace HomeTreatment.Controllers
 {
@@ -14,11 +16,14 @@ namespace HomeTreatment.Controllers
 
         private readonly HomeTreatmentDbContext _context;
 
-        public DoctorController(HomeTreatmentDbContext context)
+        private IOptions<LoadHistory> _counter;
+
+        public DoctorController(HomeTreatmentDbContext context, IOptions<LoadHistory> appSettings)
         {
             _context = context;
-        }
+            _counter = appSettings;
 
+        }
 
         public IActionResult DisplayPatients(PatiensListViewModel search)
         {
@@ -38,12 +43,8 @@ namespace HomeTreatment.Controllers
                     DoctorId = p.DoctorId
                 });
 
-
-
                 if (search.SearchTerm == null)
                 {
-
-
                     var allPatientsOfCurrentDoctor = patients.Where(wr => wr.DoctorId == loggedUserId).ToList();
 
                     return View(new PatiensListViewModel
@@ -73,11 +74,12 @@ namespace HomeTreatment.Controllers
         [HttpGet]
         public IActionResult Messages(string id)
         {
+            _counter.Value.counter = 7;
             var loggedUserEmail = User.Identity.Name;
             var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
             if (_context.Doctors.Any(an => an.Id == loggedUserId))
             {
-                var patientMessages = BuildPatientMessages(id);
+                var patientMessages = BuildPatientMessages(id, 7);
 
                 return View("Messages", patientMessages);
 
@@ -86,11 +88,11 @@ namespace HomeTreatment.Controllers
         }
 
         [HttpPost]
-        public IActionResult Messages(PatientMessagesViewModel patientMessages, string id)
+        public IActionResult Messages(PatientMessagesViewModel patientMessages)
         {
-            var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == id).DoctorId;
+            var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == patientMessages.Patient.Id).DoctorId;
 
-            var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == id).ToList();
+            var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == patientMessages.Patient.Id).ToList();
 
             if (!ModelState.IsValid)
             {
@@ -103,9 +105,9 @@ namespace HomeTreatment.Controllers
                         Timestamp = m.Timestamp,
                         IsRead = m.IsRead,
                         IsWrittenByPatient = m.IsWrittenByPatient
-                    })
+                    }).OrderByDescending(or => or.Timestamp).Take(7)
                     .ToList();
-                patientMessages.Patient.Name = _context.Patients.Single(sl => sl.Id == id).Name;
+                patientMessages.Patient.Name = _context.Patients.Single(sl => sl.Id == patientMessages.Patient.Id).Name;
                 return View("/Views/Doctor/Messages.cshtml", patientMessages);
             }
 
@@ -164,7 +166,16 @@ namespace HomeTreatment.Controllers
             return RedirectToAction(nameof(DisplayPatients));
         }
 
-        public PatientMessagesViewModel BuildPatientMessages(string patientId)
+        [HttpPost]
+        public IActionResult LoadMoreMessages(PatientMessagesViewModel model)
+        {
+            _counter.Value.counter = _counter.Value.counter + 7;
+            var loadedMessagesCount = _counter.Value.counter;
+            ModelState.Clear();
+            return View("Messages", BuildPatientMessages(model.Patient.Id, loadedMessagesCount));
+        }
+
+        public PatientMessagesViewModel BuildPatientMessages(string patientId, int loadedMessagesCount)
         {
             var patient = _context.Patients.FirstOrDefault(pt => pt.Id == patientId);
 
@@ -199,10 +210,14 @@ namespace HomeTreatment.Controllers
             }
 
 
+            allMessages = allMessages.OrderByDescending(ord => ord.Timestamp).Take(loadedMessagesCount).ToList();
+
+
+
             var patientMessages = new PatientMessagesViewModel
             {
                 Patient = patientViewModel,
-                Messages = allMessages
+                Messages = allMessages,
 
             };
 

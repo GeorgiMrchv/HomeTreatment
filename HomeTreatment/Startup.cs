@@ -1,3 +1,4 @@
+using HomeTreatment.BusinessLayer;
 using HomeTreatment.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,6 +40,8 @@ namespace HomeTreatment
                 options.LoginPath = "/Authentication/Login";
                 options.LogoutPath = "/Authentication/Logout";
             });
+
+            services.Configure<LoadHistory>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
