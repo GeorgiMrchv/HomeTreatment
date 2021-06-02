@@ -17,9 +17,12 @@ namespace HomeTreatment.Controllers
 
         private readonly HomeTreatmentDbContext _context;
 
+
+
         public DashboardController(HomeTreatmentDbContext context)
         {
             _context = context;
+
         }
 
         public IActionResult Index()
