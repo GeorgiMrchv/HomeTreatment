@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HomeTreatment.ViewModels
+namespace HomeTreatment.Web.ViewModels
 {
     public class PatientViewModel
     {

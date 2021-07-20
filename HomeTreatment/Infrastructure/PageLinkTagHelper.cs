@@ -1,11 +1,11 @@
-﻿using HomeTreatment.ViewModels;
+﻿using HomeTreatment.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace HomeTreatment.Infrastructure
+namespace HomeTreatment.Web.Web.Infrastructure
 {
     [HtmlTargetElement("div", Attributes = "page-model")]
     public class PageLinkTagHelper : TagHelper

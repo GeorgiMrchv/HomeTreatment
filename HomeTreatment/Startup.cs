@@ -1,17 +1,18 @@
-using HomeTreatment.BusinessLayer;
-using HomeTreatment.Data;
+using HomeTreatment.Web.BusinessLayer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using HomeTreatment.Data;
+using HomeTreatment.Data.Repository;
+using HomeTreatment.Web.Sample_test;
 
-namespace HomeTreatment
+namespace HomeTreatment.Web
 {
     public class Startup
-    {
+    {      
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -19,21 +20,16 @@ namespace HomeTreatment
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<OfficeEquipmentConfig>(Configuration.GetSection("OfficeEquipmentConfig")); // appsettings + class
+
             services.AddControllersWithViews();
 
-            services.AddDbContext<HomeTreatmentDbContext>(opts =>
-            {
-                opts.UseSqlServer(
-                Configuration["ConnectionStrings:HomeTreatmentConnection"]);
-            });
+            services.RegisterDataServices(Configuration);
 
-            services.AddIdentity<User, IdentityRole>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = false;
-            }).AddEntityFrameworkStores<HomeTreatmentDbContext>();
+            services.AddScoped<IRepository, Repository>(); // pri service az trqbva da definiram scope, glaven scope
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -44,7 +40,6 @@ namespace HomeTreatment
             services.Configure<LoadHistory>(Configuration);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -54,13 +49,13 @@ namespace HomeTreatment
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
-            app.UseRouting();
+            app.UseRouting(); 
 
             app.UseAuthentication();
 
@@ -69,9 +64,23 @@ namespace HomeTreatment
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "Administration",
+                    pattern: "Administration/EditAdministrator/{id}",
+                    defaults: new { controller = "Admin", action = "Edit" }
+                    );
+
+
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                
             });
         }
     }
 }
+
+//mapcontrollerroute - mvc go dobavq za da moje da mi naglasi avtomati4no route-ovete podhodqshti za kontrollerite
+// po spicifi4nite nad po obshtite
+
+

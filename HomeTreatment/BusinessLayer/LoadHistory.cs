@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HomeTreatment.BusinessLayer
+namespace HomeTreatment.Web.BusinessLayer
 {
     public class LoadHistory
     {
-        public int counter { get; set; }
+        public int Counter { get; set; }
     }
 }

@@ -1,39 +1,42 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using HomeTreatment.ViewModels;
+using HomeTreatment.Web.ViewModels;
 using HomeTreatment.Data;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using HomeTreatment.BusinessLayer;
+using HomeTreatment.Web.BusinessLayer;
+using HomeTreatment.Data.Repository;
+using HomeTreatment.Data.Models;
 
-namespace HomeTreatment.Controllers
+namespace HomeTreatment.Web.Controllers
 {
     [Authorize]
     public class DoctorController : Controller
     {
+        private readonly IRepository _repository;
 
-        private readonly HomeTreatmentDbContext _context;
+        // private IOptions<LoadHistory> _counter;
 
-        private IOptions<LoadHistory> _counter;
+        private readonly LoadHistory _counter;
 
-        public DoctorController(HomeTreatmentDbContext context, IOptions<LoadHistory> appSettings)
+        public DoctorController(IRepository repository, IOptions<LoadHistory> appSettings)
         {
-            _context = context;
-            _counter = appSettings;
+            _repository = repository;
+            _counter = appSettings.Value;
 
         }
 
         public IActionResult DisplayPatients(PatiensListViewModel search)
         {
             var loggedUserEmail = User.Identity.Name;
-            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
-            if (_context.Doctors.Any(an => an.Id == loggedUserId))
+            var loggedUserId = _repository.Set<User>().FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
+            if (_repository.Set<Doctor>().Any(an => an.Id == loggedUserId))
             {
                 var doctorId = loggedUserId;
 
-                var patients = _context.Patients.Select(p => new PatientViewModel
+                var patients = _repository.Set<Patient>().Select(p => new PatientViewModel
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -74,10 +77,10 @@ namespace HomeTreatment.Controllers
         [HttpGet]
         public IActionResult Messages(string id)
         {
-            _counter.Value.counter = 7;
+            _counter.Counter = 7;
             var loggedUserEmail = User.Identity.Name;
-            var loggedUserId = _context.Users.FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
-            if (_context.Doctors.Any(an => an.Id == loggedUserId))
+            var loggedUserId = _repository.Set<User>().FirstOrDefault(fr => fr.Email == loggedUserEmail).Id;
+            if (_repository.Set<Doctor>().Any(an => an.Id == loggedUserId))
             {
                 var patientMessages = BuildPatientMessages(id, 7);
 
@@ -90,9 +93,9 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Messages(PatientMessagesViewModel patientMessages)
         {
-            var doctorId = _context.DoctorPatientMessages.FirstOrDefault(fr => fr.PatientId == patientMessages.Patient.Id).DoctorId;
+            var doctorId = _repository.Set<DoctorPatientMessage>().FirstOrDefault(fr => fr.PatientId == patientMessages.Patient.Id).DoctorId;
 
-            var messages = _context.DoctorPatientMessages.Where(wr => wr.DoctorId == doctorId && wr.PatientId == patientMessages.Patient.Id).ToList();
+            var messages = _repository.Set<DoctorPatientMessage>().Where(wr => wr.DoctorId == doctorId && wr.PatientId == patientMessages.Patient.Id).ToList();
 
             if (!ModelState.IsValid)
             {
@@ -107,7 +110,7 @@ namespace HomeTreatment.Controllers
                         IsWrittenByPatient = m.IsWrittenByPatient
                     }).OrderByDescending(or => or.Timestamp).Take(7)
                     .ToList();
-                patientMessages.Patient.Name = _context.Patients.Single(sl => sl.Id == patientMessages.Patient.Id).Name;
+                patientMessages.Patient.Name = _repository.Set<Patient>().Single(sl => sl.Id == patientMessages.Patient.Id).Name;
                 return View("/Views/Doctor/Messages.cshtml", patientMessages);
             }
 
@@ -120,8 +123,7 @@ namespace HomeTreatment.Controllers
                 IsRead = true
             };
 
-            _context.DoctorPatientMessages.Add(patientResponse);
-            _context.SaveChanges();
+            _repository.Add(patientResponse);
 
 
             var seenMessages = messages.Where(sl => sl.IsRead == false).ToList();
@@ -129,9 +131,8 @@ namespace HomeTreatment.Controllers
             foreach (var item in seenMessages)
             {
                 item.IsRead = true;
-                _context.DoctorPatientMessages.Update(item);
+                _repository.Update(item);
             }
-            _context.SaveChanges();
 
 
             return RedirectToAction(nameof(Messages), new { id = patientMessages.Patient.Id });
@@ -141,7 +142,7 @@ namespace HomeTreatment.Controllers
         [HttpGet]
         public IActionResult Edit(string Id)
         {
-            var user = _context.Patients.FirstOrDefault(fr => fr.Id == Id);
+            var user = _repository.Set<Patient>().FirstOrDefault(fr => fr.Id == Id);
 
             var model = new PatientViewModel
             {
@@ -155,13 +156,12 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult Edit(PatientViewModel model)
         {
-            var edit = _context.Patients.FirstOrDefault(fr => fr.Id == model.Id);
+            var edit = _repository.Set<Patient>().FirstOrDefault(fr => fr.Id == model.Id);
 
             edit.Notes = model.Notes;
             edit.AttentionLevel = model.SelectedItem == "High" ? model.AttentionLevel = true : model.AttentionLevel = false;
 
-            _context.Patients.Update(edit);
-            _context.SaveChanges();
+            _repository.Update(edit);
 
             return RedirectToAction(nameof(DisplayPatients));
         }
@@ -169,17 +169,17 @@ namespace HomeTreatment.Controllers
         [HttpPost]
         public IActionResult LoadMoreMessages(PatientMessagesViewModel model)
         {
-            _counter.Value.counter = _counter.Value.counter + 7;
-            var loadedMessagesCount = _counter.Value.counter;
+            _counter.Counter = _counter.Counter + 7;
+            var loadedMessagesCount = _counter.Counter;
             ModelState.Clear();
             return View("Messages", BuildPatientMessages(model.Patient.Id, loadedMessagesCount));
         }
 
         public PatientMessagesViewModel BuildPatientMessages(string patientId, int loadedMessagesCount)
         {
-            var patient = _context.Patients.FirstOrDefault(pt => pt.Id == patientId);
+            var patient =_repository.Set<Patient>().FirstOrDefault(pt => pt.Id == patientId);
 
-            var messages = _context.DoctorPatientMessages.Where(msg => msg.PatientId == patientId).ToList();
+            var messages = _repository.Set<DoctorPatientMessage>().Where(msg => msg.PatientId == patientId).ToList();
 
             var patientViewModel = new PatientViewModel
             {

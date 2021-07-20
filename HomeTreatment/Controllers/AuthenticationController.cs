@@ -1,12 +1,14 @@
 ﻿using System.Threading.Tasks;
-using HomeTreatment.Data;
-using HomeTreatment.ViewModels;
+using HomeTreatment.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using HomeTreatment.Infrastructure.Enum;
+using HomeTreatment.Web.Infrastructure;
+using HomeTreatment.Data;
+using HomeTreatment.Data.Repository;
+using HomeTreatment.Data.Models;
 
-namespace HomeTreatment.Controllers
+namespace HomeTreatment.Web.Controllers
 {
     public class AuthenticationController : Controller
     {
@@ -14,14 +16,13 @@ namespace HomeTreatment.Controllers
 
         private readonly SignInManager<User> _signInManager;
 
-        private readonly HomeTreatmentDbContext _context;
+        private readonly IRepository _repository;
 
-
-        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signInManager, HomeTreatmentDbContext context)
+        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signInManager, IRepository repository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
+            _repository = repository;
         }
 
         public IActionResult Index()
@@ -39,6 +40,11 @@ namespace HomeTreatment.Controllers
         public async Task<IActionResult> Login(UserViewModel userViewModel)
         {
 
+            if (string.IsNullOrEmpty(userViewModel.EmailAddress))
+            {
+                ModelState.AddModelError(nameof(UserViewModel.EmailAddress), "Enter a name");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(userViewModel);
@@ -54,22 +60,21 @@ namespace HomeTreatment.Controllers
                 {
                     string userId = user.Id;
 
-
-
-                    if (_context.Doctors.Any(an => an.Id == userId))
+                    if (_repository.Set<Doctor>().Any(an => an.Id == userId))
                     {
                         return RedirectToAction("Index", "Dashboard");
                     }
 
-                    else if (_context.Patients.Any(an => an.Id == userId))
+                    else if (_repository.Set<Patient>().Any(an => an.Id == userId))
                     {
                         return RedirectToAction("Index","Dashboard");
 
                     }
 
-                    else if (!_context.Patients.Any(an => an.Id == userId) && !_context.Doctors.Any(an => an.Id == userId))
+                    else if (!_repository.Set<Patient>().Any(an => an.Id == userId) && !_repository.Set<Doctor>().Any(an => an.Id == userId))
                     {
-                        if (_context.UserRoles.Any(fr => fr.UserId == userId && fr.RoleId == ((int)UserRole.Admin).ToString()))
+                        //if (_context.UserRoles.Any(fr => fr.UserId == userId && fr.RoleId == ((int)UserRole.Admin).ToString()))
+                        if (_repository.Set<IdentityUserRole<string>>().Any(fr => fr.UserId == userId && fr.RoleId == ((int)UserRole.Admin).ToString()))
                         {
                             return RedirectToAction("AllUsers", "Admin");
                         }

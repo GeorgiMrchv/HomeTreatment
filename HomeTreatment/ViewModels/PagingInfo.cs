@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HomeTreatment.ViewModels
+namespace HomeTreatment.Web.ViewModels
 {
     public class PagingInfo
     {

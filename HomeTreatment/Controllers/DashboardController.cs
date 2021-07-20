@@ -4,31 +4,29 @@ using System.Linq;
 using System.Security.Claims;
 using HomeTreatment.Data;
 using HomeTreatment.Data.Models;
-using HomeTreatment.ViewModels;
+using HomeTreatment.Data.Repository;
+using HomeTreatment.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace HomeTreatment.Controllers
+namespace HomeTreatment.Web.Controllers
 {
     [Authorize]
     public class DashboardController : Controller
     {
 
-        private readonly HomeTreatmentDbContext _context;
+        private readonly IRepository _repository;
 
-
-
-        public DashboardController(HomeTreatmentDbContext context)
+        public DashboardController(IRepository repository)
         {
-            _context = context;
-
+            _repository = repository;
         }
 
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _context.Users
+            var user = _repository.Set<User>()
                 .Include(u => u.Patient.DoctorPatientMessages)
                 .Include(u => u.Patient.Doctor)
                 .Include(u => u.Doctor.Patients)
@@ -57,7 +55,7 @@ namespace HomeTreatment.Controllers
         public IActionResult SendMessageToDoctor(PatientDashboardViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _context.Users
+            var user = _repository.Set<User>()
                 .Include(u => u.Patient.DoctorPatientMessages)
                 .Single(u => u.Id == userId);
 
@@ -77,7 +75,7 @@ namespace HomeTreatment.Controllers
 
                     return View(model);
                 }
-                else if (!_context.Doctors.Any(d => d.Id == model.DoctorId))
+                else if (!_repository.Set<Doctor>().Any(d => d.Id == model.DoctorId))
                 {
                     ModelState.AddModelError(nameof(model.DoctorId), "There is no doctor with the provided Id.");
 
@@ -87,7 +85,7 @@ namespace HomeTreatment.Controllers
                 user.Patient.DoctorId = model.DoctorId;
             }
 
-            _context.DoctorPatientMessages.Add(new DoctorPatientMessage
+           _repository.Add(new DoctorPatientMessage
             {
                 DoctorId = user.Patient.DoctorId,
                 PatientId = user.Patient.Id,
@@ -96,21 +94,18 @@ namespace HomeTreatment.Controllers
                 Timestamp = DateTime.Now
             });
 
-            _context.SaveChanges();
-
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult SetMessageAsRead(string Id)
         {
-            var message = _context.DoctorPatientMessages.Where(fr => fr.PatientId == Id).ToList();
+            var message = _repository.Set<DoctorPatientMessage>().Where(fr => fr.PatientId == Id).ToList();
 
             foreach (var item in message)
             {
                 item.IsRead = true;
-                _context.DoctorPatientMessages.Update(item);
+                _repository.Update(item);
             }
-            _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
@@ -118,7 +113,7 @@ namespace HomeTreatment.Controllers
         [NonAction]
         List<PatientViewModel> FindPatientsWithUnreadMessages(string doctorId)
         {
-            return _context.Patients
+            return _repository.Set<Patient>()
                     .Where(p => p.DoctorId == doctorId && p.DoctorPatientMessages.Any(m => m.IsWrittenByPatient && m.IsRead == false))
                     .Select(p => new PatientViewModel
                     {
@@ -155,7 +150,7 @@ namespace HomeTreatment.Controllers
                 .OrderBy(m => m.Timestamp)
                 .ToList();
 
-            model.Doctors = _context.Doctors
+            model.Doctors = _repository.Set<Doctor>()
                 .Select(d => new DoctorViewModel
                 {
                     Id = d.Id,
