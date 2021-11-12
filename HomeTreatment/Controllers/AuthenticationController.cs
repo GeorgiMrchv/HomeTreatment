@@ -39,7 +39,7 @@ namespace HomeTreatment.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UserViewModel userViewModel)
         {
-
+            //validation -- dobra praktika e na publi4nitemetodi da si slagam validation
             if (string.IsNullOrEmpty(userViewModel.EmailAddress))
             {
                 ModelState.AddModelError(nameof(UserViewModel.EmailAddress), "Enter a name");
@@ -50,6 +50,7 @@ namespace HomeTreatment.Web.Controllers
                 return View(userViewModel);
             }
 
+            //data access
             var user = await _userManager.FindByEmailAsync(userViewModel.EmailAddress);
 
             if (user != null)
@@ -84,9 +85,6 @@ namespace HomeTreatment.Web.Controllers
                 }
             }
             return Content("Invalid user name or password");
-
-
-
         }
 
         public IActionResult Register()

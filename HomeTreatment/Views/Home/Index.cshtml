@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UserViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -23,8 +24,8 @@
                 <p class="card-text"> <b>Diagnostics</b> nowadays give us an accurate picture of a person's current health status. We do this in a convenient time of the patient trying not to hinder all his commitments. Our medical staff are working professionally and responsibly to track out all the emergent problems.</p>
             </div>
             @*<div class="card card-footer">
-                <a href="#" class="btn btn-primary">Find Out More!</a>
-            </div>*@
+                    <a href="#" class="btn btn-primary">Find Out More!</a>
+                </div>*@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
@@ -36,8 +37,8 @@
                 <p class="card-text">Our <b>Treatment plan</b> is to combine not only drugs and medical care, but also to include appropriate nutrition diet and sport to the whole process of recovery. We stand behind the idea that combination of all these steps help for the good health care and we provide an assistance by making up such a plan.</p>
             </div>
             @*<div class="card card-footer">
-                <a href="#" class="btn btn-primary">Find Out More!</a>
-            </div>*@
+                    <a href="#" class="btn btn-primary">Find Out More!</a>
+                </div>*@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
@@ -49,8 +50,8 @@
                 <p class="card-text"> We are well acquainted that not all drugs are doing their job for the most of the time, so with our service <b>Prescription drugs</b> we monitor the chemical process in our patients body, so that we know their status and change some of the drugs if needed, so that to provide the best answer in the period of recovery.</p>
             </div>
             @*<div class="card card-footer">
-                <a href="#" class="btn btn-primary">Find Out More!</a>
-            </div>*@
+                    <a href="#" class="btn btn-primary">Find Out More!</a>
+                </div>*@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
@@ -62,8 +63,60 @@
                 <p class="card-text"> Here we have a full storage of a clean, high quality and well-maintained <b>Health equipment</b> for all the needs that our patients have. We insist on this addition to our home treatment services, because it is a vital part as well, because the equipment prevents damages and breaking the process at some point.</p>
             </div>
             @*<div class="card card-footer">
-                <a href="#" class="btn btn-primary">Find Out More!</a>
-            </div>*@
+                    <a href="#" class="btn btn-primary">Find Out More!</a>
+                </div>*@
         </div>
     </div>
 </div>
+
+
+
+@* AJAX CALL SUCCESS*@
+@*<button class="btn btn-primary" onclick="loadAllUsers()">Load Users</button>
+
+<div class="col-sm-8">
+    <h3> Table User </h3>
+    <table id="owner-table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            <tr>
+        </thead>
+        <tbody> </tbody>
+    </table>
+</div>*@
+
+
+
+
+@* AJAX CALL SUCCESS*@
+    @*@section scripts{
+<script type="text/javascript">
+        function loadAllUsers() {
+            $.ajax({
+                url: '@Url.Action("GetAllUsers")',
+                type: "POST",
+                data: null,
+                dataType: "json",
+                success: function (response) {
+                    $("#owner-table tbody tr").remove();
+                    if (response.length === 0) {
+                        $('#owner-table').append('<tr><td>No Users!</td></tr>');
+                    } else {
+                        response.forEach(function (owner) {
+                            addPersonIntoOwnersTable(owner.id, owner.firstName, owner.email);
+                        });
+                    }
+                },
+                failure: function (response) {
+                    alert(response);
+                }
+            });
+        }
+        function addPersonIntoOwnersTable(id, name, emailAddress) {
+            $('#owner-table').append('<tr><td>' + id + '</td><td>' + name + '</td><td>' + emailAddress + '</td></tr>')
+        }
+</script>
+
+}*@

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using HomeTreatment.Data;
 using HomeTreatment.Data.Repository;
 using HomeTreatment.Web.Sample_test;
+using HomeTreatment.Business.Services;
 
 namespace HomeTreatment.Web
 {
@@ -30,6 +31,9 @@ namespace HomeTreatment.Web
             services.RegisterDataServices(Configuration);
 
             services.AddScoped<IRepository, Repository>(); // pri service az trqbva da definiram scope, glaven scope
+
+            // From: HomeTreatment.Business
+            services.AddTransient<IUsersService, Users>();
 
             services.ConfigureApplicationCookie(options =>
             {
